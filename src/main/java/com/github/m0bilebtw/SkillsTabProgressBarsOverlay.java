@@ -41,17 +41,21 @@ public class SkillsTabProgressBarsOverlay extends Overlay {
         }
 
         final int barHeight = config.barHeight();
+        final Skill hoveredSkill = SkillsTabProgressBarsPlugin.hoveredSkill;
 
         for (Widget skillWidget : skillsContainer.getStaticChildren()) {
             Skill skill = plugin.skillFromWidgetID(skillWidget.getId());
-            if (skill == null) {
+            if (skill == null || skill == Skill.OVERALL) {
                 // Skip invalid or unknown skills (includes the skill sidestone and the total level panel)
                 continue;
             }
+            if (hoveredSkill != null && hoveredSkill != skill) {
+                // Skip if hovering a skill that isn't this one
+                continue;
+            }
 
-            double thisSkillProgressNormalised = plugin.progressNormalised.getOrDefault(skill, 0d);
-
-            if (thisSkillProgressNormalised != 1d) {
+            double thisSkillProgressNormalised = plugin.progressNormalised.getOrDefault(skill, 1d);
+            if (thisSkillProgressNormalised < 1d) {
                 Rectangle bounds = skillWidget.getBounds();
 
                 final int barWidth = Math.max(MINIMUM_BAR_WIDTH_TO_BE_SEEN_WELL, (int) (thisSkillProgressNormalised * bounds.getWidth()));

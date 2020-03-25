@@ -2,9 +2,14 @@ package com.github.m0bilebtw;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Client;
 import net.runelite.api.Experience;
 import net.runelite.api.Skill;
 import net.runelite.api.events.StatChanged;
+import net.runelite.api.events.WidgetLoaded;
+import net.runelite.api.widgets.JavaScriptCallback;
+import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
@@ -25,8 +30,14 @@ import java.util.Map;
 public class SkillsTabProgressBarsPlugin extends Plugin {
 
 	static final int MINIMUM_BAR_HEIGHT = 1;
-	static final int MAXIMUM_BAR_HEIGHT = 15;
+	static final int MAXIMUM_BAR_HEIGHT = 32;
 	static final int MINIMUM_BAR_WIDTH_TO_BE_SEEN_WELL = 2;
+
+	@Inject
+	private Client client;
+
+	@Inject
+	private SkillsTabProgressBarsPlugin plugin;
 
 	@Inject
 	private SkillsTabProgressBarsOverlay overlay;
@@ -67,6 +78,31 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 		progressNormalised.put(skill, progressToLevelNormalised);
 	}
 
+	@Subscribe
+	public void onWidgetLoaded(WidgetLoaded widget) {
+		if (widget.getGroupId() == WidgetInfo.SKILLS_CONTAINER.getGroupId()) {
+			attachHoverListeners();
+		}
+	}
+
+	static Skill hoveredSkill = null;
+
+	private void attachHoverListeners() {
+		Widget skillsContainer = client.getWidget(WidgetInfo.SKILLS_CONTAINER);
+		if (skillsContainer == null) {
+			log.info("skills container widget not found - not attaching hovered skill listeners");
+			return;
+		}
+
+		for (Widget skillWidget : skillsContainer.getStaticChildren()) {
+			final Skill skill = plugin.skillFromWidgetID(skillWidget.getId());
+			if (skill != null) { /* skip invalid skill widgets (such as the side stone) */
+				skillWidget.setOnMouseOverListener((JavaScriptCallback) event -> hoveredSkill = skill);
+			}
+		}
+		skillsContainer.setOnMouseLeaveListener((JavaScriptCallback) event -> hoveredSkill = null);
+	}
+
 	Skill skillFromWidgetID(int widgetID) {
 		// RuneLite provides no mapping for widget IDs -> Skill, so this is required */
 		switch(widgetID) {
@@ -93,6 +129,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 			case 20971541: return Skill.FIREMAKING;
 			case 20971542: return Skill.WOODCUTTING;
 			case 20971543: return Skill.FARMING;
+			case 20971544: return Skill.OVERALL;
 			default: return null;
 		}
 	}
