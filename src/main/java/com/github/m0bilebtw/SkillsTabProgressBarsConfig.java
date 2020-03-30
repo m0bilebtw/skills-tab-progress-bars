@@ -28,6 +28,16 @@ public interface SkillsTabProgressBarsConfig extends Config {
         return false;
     }
 
+    @ConfigItem(
+            keyName = "indent",
+            name = "Match skill panel indent",
+            description = "Progress bars and backgrounds will start and stop a few pixels indented to match the skill panel",
+            position = 3
+    )
+    default boolean indent() {
+        return true;
+    }
+
     @Range(
             min = SkillsTabProgressBarsPlugin.MINIMUM_BAR_HEIGHT,
             max = SkillsTabProgressBarsPlugin.MAXIMUM_BAR_HEIGHT
@@ -36,7 +46,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
             keyName = "barHeight",
             name = "Progress bar height",
             description = "The height of the progress bars displayed over the skills tab",
-            position = 3
+            position = 4
     )
     default int barHeight() {
         return 3;

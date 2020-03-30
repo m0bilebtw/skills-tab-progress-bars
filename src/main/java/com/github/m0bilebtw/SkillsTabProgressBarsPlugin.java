@@ -31,7 +31,6 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 
 	static final int MINIMUM_BAR_HEIGHT = 1;
 	static final int MAXIMUM_BAR_HEIGHT = 32;
-	static final int MINIMUM_BAR_WIDTH_TO_BE_SEEN_WELL = 2;
 
 	@Inject
 	private Client client;
