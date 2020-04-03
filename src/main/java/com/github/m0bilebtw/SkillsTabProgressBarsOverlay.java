@@ -56,16 +56,12 @@ public class SkillsTabProgressBarsOverlay extends Overlay {
                 continue;
             }
 
-            double thisSkillProgressNormalised = plugin.progressNormalised.getOrDefault(skill, 1d);
-            if (thisSkillProgressNormalised < 1d) {
+            double thisSkillProgressToLevelNormalised = plugin.progressToLevelNormalised.getOrDefault(skill, 1d);
+            if (thisSkillProgressToLevelNormalised < 1d) {
                 // Actually draw widgets that get here
                 Rectangle bounds = skillWidget.getBounds();
-                int effectiveBoundsWidth = (int) bounds.getWidth();
-                if (indent) {
-                    effectiveBoundsWidth -= (2 * INDENT_WIDTH_ONE_SIDE);
-                }
-
-                final int barWidth = Math.max(MINIMUM_BAR_WIDTH_TO_BE_SEEN_WELL, (int) (thisSkillProgressNormalised * effectiveBoundsWidth));
+                final int effectiveBoundsWidth = (int) bounds.getWidth() - (indent ? 2 * INDENT_WIDTH_ONE_SIDE : 0);
+                final int barWidthToLevel = Math.max(MINIMUM_BAR_WIDTH_TO_BE_SEEN_WELL, (int) (thisSkillProgressToLevelNormalised * effectiveBoundsWidth));
                 final int barStartX = (int) bounds.getX() + (indent ? INDENT_WIDTH_ONE_SIDE : 0);
 
                 if (config.drawBackgrounds()) {
@@ -73,12 +69,12 @@ public class SkillsTabProgressBarsOverlay extends Overlay {
                     graphics.fillRect(barStartX, (int) (bounds.getY() + bounds.getHeight() - barHeight), effectiveBoundsWidth, barHeight);
                 }
 
-                Color fadedColourNoAlpha = Color.getHSBColor((float) (thisSkillProgressNormalised * 120f) / 360, 1f, 1f);
+                Color fadedColourNoAlpha = Color.getHSBColor((float) (thisSkillProgressToLevelNormalised * 120f) / 360, 1f, 1f);
                 graphics.setColor(config.transparency() ?
                         new Color(fadedColourNoAlpha.getColorSpace(), fadedColourNoAlpha.getComponents(null), 0.5f) :
                         fadedColourNoAlpha
                 );
-                graphics.fillRect(barStartX, (int) (bounds.getY() + bounds.getHeight() - barHeight), barWidth, barHeight);
+                graphics.fillRect(barStartX, (int) (bounds.getY() + bounds.getHeight() - barHeight), barWidthToLevel, barHeight);
             }
         }
         return null;

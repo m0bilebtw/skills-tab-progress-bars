@@ -3,8 +3,9 @@
 Adds progress bars to the skills tab to show how close the next level ups are
 
 Config options include 
-- transparency toggle
 - draw bar backgrounds toggle
+- transparency toggle
+- option to indent to match skill panel corners
 - adjustable bar height
 
 While hovering a skill, all progress bars except the one for that skill are hidden.

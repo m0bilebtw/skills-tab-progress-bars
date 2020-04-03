@@ -4,6 +4,7 @@ import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.Experience;
+import net.runelite.api.GameState;
 import net.runelite.api.Skill;
 import net.runelite.api.events.StatChanged;
 import net.runelite.api.events.WidgetLoaded;
@@ -47,6 +48,14 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 	@Override
 	protected void startUp() throws Exception {
 		overlayManager.add(overlay);
+
+		// If user already logged in, we must manually get the first xp state
+		// Otherwise, it would only show bars for skills being trained, or need a world hop/relog to show all
+		if (client.getGameState() == GameState.LOGGED_IN) {
+			log.info("Plugin startup while logged in - manually finding skill progress and attaching hover listeners");
+			calculateAndStoreProgressForAllSkillsToLevel();
+			attachHoverListeners();
+		}
 	}
 
 	@Override
@@ -59,14 +68,24 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 		return configManager.getConfig(SkillsTabProgressBarsConfig.class);
 	}
 
-	final Map<Skill, Double> progressNormalised = new HashMap<>();
+	final Map<Skill, Double> progressToLevelNormalised = new HashMap<>();
 
 	@Subscribe
 	public void onStatChanged(StatChanged statChanged) {
-		final Skill skill = statChanged.getSkill();
-		final int currentXp = statChanged.getXp();
-		final int currentLevel = statChanged.getLevel();
+		calculateAndStoreProgressToLevel(statChanged.getSkill(), statChanged.getXp(), statChanged.getLevel());
+	}
 
+	private void calculateAndStoreProgressForAllSkillsToLevel() {
+		for (Skill skill : Skill.values()) {
+			if (skill == Skill.OVERALL) {
+				// No calculation done for total level
+				continue;
+			}
+			calculateAndStoreProgressToLevel(skill, client.getSkillExperience(skill), client.getRealSkillLevel(skill));
+		}
+	}
+
+	private void calculateAndStoreProgressToLevel(Skill skill, int currentXp, int currentLevel) {
 		double progressToLevelNormalised = 1d;
 		if (currentLevel < Experience.MAX_REAL_LEVEL) {
 			final int xpForCurrentLevel = Experience.getXpForLevel(currentLevel);
@@ -74,7 +93,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 					(1d * (currentXp - xpForCurrentLevel)) /
 							(Experience.getXpForLevel(currentLevel + 1) - xpForCurrentLevel);
 		}
-		progressNormalised.put(skill, progressToLevelNormalised);
+		this.progressToLevelNormalised.put(skill, progressToLevelNormalised);
 	}
 
 	@Subscribe
