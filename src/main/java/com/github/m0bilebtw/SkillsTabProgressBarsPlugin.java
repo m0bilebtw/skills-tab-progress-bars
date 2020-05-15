@@ -6,6 +6,7 @@ import net.runelite.api.Client;
 import net.runelite.api.Experience;
 import net.runelite.api.GameState;
 import net.runelite.api.Skill;
+import net.runelite.api.VarPlayer;
 import net.runelite.api.events.StatChanged;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.widgets.JavaScriptCallback;
@@ -69,10 +70,12 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 	}
 
 	final Map<Skill, Double> progressToLevelNormalised = new HashMap<>();
+	final Map<Skill, Double> progressToGoalNormalised = new HashMap<>();
 
 	@Subscribe
 	public void onStatChanged(StatChanged statChanged) {
 		calculateAndStoreProgressToLevel(statChanged.getSkill(), statChanged.getXp());
+		calculateAndStoreProgressToGoal(statChanged.getSkill(), statChanged.getXp());
 	}
 
 	private void calculateAndStoreProgressForAllSkillsToLevel() {
@@ -82,6 +85,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 				continue;
 			}
 			calculateAndStoreProgressToLevel(skill, client.getSkillExperience(skill));
+			calculateAndStoreProgressToGoal(skill, client.getSkillExperience(skill));
 		}
 	}
 
@@ -95,6 +99,20 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 							(Experience.getXpForLevel(currentLevel + 1) - xpForCurrentLevel);
 		}
 		this.progressToLevelNormalised.put(skill, progressToLevelNormalised);
+	}
+
+	private void calculateAndStoreProgressToGoal(Skill skill, int currentXp) {
+		double progressToGoalNormalised = 1d;
+		final VarPlayer startGoal = getStartGoalVarPlayer(skill);
+		final VarPlayer endGoal = getEndGoalVarPlayer(skill);
+		if (startGoal != null && endGoal != null) {
+			final int startGoalXp = client.getVar(startGoal);
+			final int endGoalXp = client.getVar(endGoal);
+			progressToGoalNormalised =
+					(1d * (currentXp - startGoalXp)) /
+							(endGoalXp - startGoalXp);
+		}
+		this.progressToGoalNormalised.put(skill, progressToGoalNormalised);
 	}
 
 	@Subscribe
@@ -123,7 +141,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 	}
 
 	Skill skillFromWidgetID(int widgetID) {
-		// RuneLite provides no mapping for widget IDs -> Skill, so this is required */
+		// RuneLite provides no mapping for widget IDs -> Skill, so this is required and potentially liable to break upon updates
 		switch(widgetID) {
 			case 20971521: return Skill.ATTACK;
 			case 20971522: return Skill.STRENGTH;
@@ -149,6 +167,64 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 			case 20971542: return Skill.WOODCUTTING;
 			case 20971543: return Skill.FARMING;
 			case 20971544: return Skill.OVERALL;
+			default: return null;
+		}
+	}
+
+	private VarPlayer getStartGoalVarPlayer(Skill skill) {
+		switch(skill) {
+			case ATTACK: return VarPlayer.ATTACK_GOAL_START;
+			case STRENGTH: return VarPlayer.STRENGTH_GOAL_START;
+			case DEFENCE: return VarPlayer.DEFENCE_GOAL_START;
+			case RANGED: return VarPlayer.RANGED_GOAL_START;
+			case PRAYER: return VarPlayer.PRAYER_GOAL_START;
+			case MAGIC: return VarPlayer.MAGIC_GOAL_START;
+			case RUNECRAFT: return VarPlayer.RUNECRAFT_GOAL_START;
+			case CONSTRUCTION: return VarPlayer.CONSTRUCTION_GOAL_START;
+			case HITPOINTS: return VarPlayer.HITPOINTS_GOAL_START;
+			case AGILITY: return VarPlayer.AGILITY_GOAL_START;
+			case HERBLORE: return VarPlayer.HERBLORE_GOAL_START;
+			case THIEVING: return VarPlayer.THIEVING_GOAL_START;
+			case CRAFTING: return VarPlayer.CRAFTING_GOAL_START;
+			case FLETCHING: return VarPlayer.FLETCHING_GOAL_START;
+			case SLAYER: return VarPlayer.SLAYER_GOAL_START;
+			case HUNTER: return VarPlayer.HUNTER_GOAL_START;
+			case MINING: return VarPlayer.MINING_GOAL_START;
+			case SMITHING: return VarPlayer.SMITHING_GOAL_START;
+			case FISHING: return VarPlayer.FISHING_GOAL_START;
+			case COOKING: return VarPlayer.COOKING_GOAL_START;
+			case FIREMAKING: return VarPlayer.FIREMAKING_GOAL_START;
+			case WOODCUTTING: return VarPlayer.WOODCUTTING_GOAL_START;
+			case FARMING: return VarPlayer.FARMING_GOAL_START;
+			default: return null;
+		}
+	}
+
+	private VarPlayer getEndGoalVarPlayer(Skill skill) {
+		switch(skill) {
+			case ATTACK: return VarPlayer.ATTACK_GOAL_END;
+			case STRENGTH: return VarPlayer.STRENGTH_GOAL_END;
+			case DEFENCE: return VarPlayer.DEFENCE_GOAL_END;
+			case RANGED: return VarPlayer.RANGED_GOAL_END;
+			case PRAYER: return VarPlayer.PRAYER_GOAL_END;
+			case MAGIC: return VarPlayer.MAGIC_GOAL_END;
+			case RUNECRAFT: return VarPlayer.RUNECRAFT_GOAL_END;
+			case CONSTRUCTION: return VarPlayer.CONSTRUCTION_GOAL_END;
+			case HITPOINTS: return VarPlayer.HITPOINTS_GOAL_END;
+			case AGILITY: return VarPlayer.AGILITY_GOAL_END;
+			case HERBLORE: return VarPlayer.HERBLORE_GOAL_END;
+			case THIEVING: return VarPlayer.THIEVING_GOAL_END;
+			case CRAFTING: return VarPlayer.CRAFTING_GOAL_END;
+			case FLETCHING: return VarPlayer.FLETCHING_GOAL_END;
+			case SLAYER: return VarPlayer.SLAYER_GOAL_END;
+			case HUNTER: return VarPlayer.HUNTER_GOAL_END;
+			case MINING: return VarPlayer.MINING_GOAL_END;
+			case SMITHING: return VarPlayer.SMITHING_GOAL_END;
+			case FISHING: return VarPlayer.FISHING_GOAL_END;
+			case COOKING: return VarPlayer.COOKING_GOAL_END;
+			case FIREMAKING: return VarPlayer.FIREMAKING_GOAL_END;
+			case WOODCUTTING: return VarPlayer.WOODCUTTING_GOAL_END;
+			case FARMING: return VarPlayer.FARMING_GOAL_END;
 			default: return null;
 		}
 	}

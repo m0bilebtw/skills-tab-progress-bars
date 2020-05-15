@@ -45,7 +45,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
     @ConfigItem(
             keyName = "barHeight",
             name = "Progress bar height",
-            description = "The height of the progress bars displayed over the skills tab",
+            description = "The total height of the progress bars displayed over the skills tab (with goals showing, height is shared between the bars if set too high)",
             position = 4
     )
     default int barHeight() {
@@ -53,12 +53,22 @@ public interface SkillsTabProgressBarsConfig extends Config {
     }
 
     @ConfigItem(
-            keyName = "virtuallevels",
+            keyName = "virtualLevels",
             name = "Show for virtual levels",
             description = "Show progress towards 'virtual levels' past 99",
             position = 5
     )
-    default boolean virtuallevels() {
+    default boolean virtualLevels() {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "showGoals",
+            name = "Show goals progress",
+            description = "Show progress towards the goals you set using the in-game XP menu in addition to progress towards individual levels",
+            position = 6
+    )
+    default boolean showGoals() {
         return false;
     }
 }
