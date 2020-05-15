@@ -51,5 +51,15 @@ public interface SkillsTabProgressBarsConfig extends Config {
     default int barHeight() {
         return 3;
     }
+
+    @ConfigItem(
+            keyName = "virtuallevels",
+            name = "Show for virtual levels",
+            description = "Show progress towards 'virtual levels' past 99",
+            position = 5
+    )
+    default boolean virtuallevels() {
+        return false;
+    }
 }
 

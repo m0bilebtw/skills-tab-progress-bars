@@ -57,7 +57,7 @@ public class SkillsTabProgressBarsOverlay extends Overlay {
             }
 
             double thisSkillProgressToLevelNormalised = plugin.progressToLevelNormalised.getOrDefault(skill, 1d);
-            if (thisSkillProgressToLevelNormalised < 1d) {
+            if (thisSkillProgressToLevelNormalised < 1d && (config.virtuallevels() || client.getRealSkillLevel(skill) < 99)) {
                 // Actually draw widgets that get here
                 Rectangle bounds = skillWidget.getBounds();
                 final int effectiveBoundsWidth = (int) bounds.getWidth() - (indent ? 2 * INDENT_WIDTH_ONE_SIDE : 0);

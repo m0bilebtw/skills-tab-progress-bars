@@ -72,7 +72,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 
 	@Subscribe
 	public void onStatChanged(StatChanged statChanged) {
-		calculateAndStoreProgressToLevel(statChanged.getSkill(), statChanged.getXp(), statChanged.getLevel());
+		calculateAndStoreProgressToLevel(statChanged.getSkill(), statChanged.getXp());
 	}
 
 	private void calculateAndStoreProgressForAllSkillsToLevel() {
@@ -81,13 +81,14 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 				// No calculation done for total level
 				continue;
 			}
-			calculateAndStoreProgressToLevel(skill, client.getSkillExperience(skill), client.getRealSkillLevel(skill));
+			calculateAndStoreProgressToLevel(skill, client.getSkillExperience(skill));
 		}
 	}
 
-	private void calculateAndStoreProgressToLevel(Skill skill, int currentXp, int currentLevel) {
+	private void calculateAndStoreProgressToLevel(Skill skill, int currentXp) {
 		double progressToLevelNormalised = 1d;
-		if (currentLevel < Experience.MAX_REAL_LEVEL) {
+		int currentLevel = Experience.getLevelForXp(currentXp);
+		if (currentLevel < Experience.MAX_VIRT_LEVEL) {
 			final int xpForCurrentLevel = Experience.getXpForLevel(currentLevel);
 			progressToLevelNormalised =
 					(1d * (currentXp - xpForCurrentLevel)) /
