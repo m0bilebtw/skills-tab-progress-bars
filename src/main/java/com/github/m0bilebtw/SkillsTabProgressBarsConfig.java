@@ -49,7 +49,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
             position = 4
     )
     default int barHeight() {
-        return 3;
+        return 2;
     }
 
     @ConfigItem(
