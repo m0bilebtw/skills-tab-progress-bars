@@ -21,6 +21,10 @@ public class SkillsTabProgressBarsOverlay extends Overlay {
     private final Client client;
     private final SkillsTabProgressBarsPlugin plugin;
     private final SkillsTabProgressBarsConfig config;
+    private float[] progressStartHSBA;
+    private float[] progressEndHSBA;
+	private float[] goalStartHSBA;
+	private float[] goalEndHSBA;
 
     static final int MINIMUM_BAR_WIDTH_TO_BE_SEEN_WELL = 2;
     static final int INDENT_WIDTH_ONE_SIDE = 4; // The skill panel from OSRS indents 3 pixels at the bottom (and top)
@@ -32,6 +36,7 @@ public class SkillsTabProgressBarsOverlay extends Overlay {
         this.client = client;
         this.plugin = plugin;
         this.config = config;
+        generateHSBAComponents();
     }
 
     @Override
@@ -83,25 +88,50 @@ public class SkillsTabProgressBarsOverlay extends Overlay {
     }
 
     private void drawBackBar(Graphics2D graphics, Rectangle bounds, int effectiveBoundsWidth, int barHeight, int barStartX, int heightAlreadyDrawn) {
-        if (config.drawBackgrounds()) {
-            graphics.setColor(config.transparency() ? new Color(0, 0, 0, 127) : Color.BLACK);
-            graphics.fillRect(barStartX, (int) (bounds.getY() + bounds.getHeight() - barHeight - heightAlreadyDrawn), effectiveBoundsWidth, barHeight);
-        }
+    	graphics.setColor(config.backgroundColor());
+    	graphics.fillRect(barStartX, (int) (bounds.getY() + bounds.getHeight() - barHeight - heightAlreadyDrawn), effectiveBoundsWidth, barHeight);
     }
 
     private void drawFrontBar(double progressNormalised, Graphics2D graphics, Rectangle bounds, int barWidth, int barHeight, int barStartX, boolean forGoal, int heightAlreadyDrawn) {
-        Color fadedColourNoAlpha; // Hues: 0 to 120 for levels, 240 to 330 for goals
-        if (forGoal) {
-            fadedColourNoAlpha = Color.getHSBColor((float) (240f + (progressNormalised * 90f)) / 360, 1f, 1f);
-        } else {
-            fadedColourNoAlpha = Color.getHSBColor((float) (progressNormalised * 120f) / 360, 1f, 1f);
-        }
+		float[] colorStartHSBA;
+		float[] colorEndHSBA;
+		if (forGoal) {
+			colorStartHSBA = goalStartHSBA;
+			colorEndHSBA = goalEndHSBA;
+		}
+		else {
+			colorStartHSBA = progressStartHSBA;
+			colorEndHSBA = progressEndHSBA;
+		}
 
-        graphics.setColor(config.transparency() ?
-                new Color(fadedColourNoAlpha.getColorSpace(), fadedColourNoAlpha.getComponents(null), 0.5f) :
-                fadedColourNoAlpha
-        );
+		Color color = Color.getHSBColor(
+				(float) (colorStartHSBA[0] + progressNormalised * (colorEndHSBA[0] - colorStartHSBA[0])),
+				(float) (colorStartHSBA[1] + progressNormalised * (colorEndHSBA[1] - colorStartHSBA[1])),
+				(float) (colorStartHSBA[2] + progressNormalised * (colorEndHSBA[2] - colorStartHSBA[2])));
+
+        graphics.setColor(new Color (
+        		color.getColorSpace(),
+				color.getComponents(null),
+				(float) (colorStartHSBA[3] + progressNormalised * (colorEndHSBA[3] - colorStartHSBA[3]))));
         graphics.fillRect(barStartX, (int) (bounds.getY() + bounds.getHeight() - barHeight - heightAlreadyDrawn), barWidth, barHeight);
     }
+
+    protected void generateHSBAComponents() {
+		progressStartHSBA = getHSBAArray(config.progressBarStartColor());
+		progressEndHSBA = getHSBAArray(config.progressBarEndColor());
+		goalStartHSBA = getHSBAArray(config.goalBarStartColor());
+		goalEndHSBA = getHSBAArray(config.goalBarEndColor());
+	}
+
+	/*
+	Given a color, return the HSBA components of it in order
+	 */
+	private float[] getHSBAArray(Color color) {
+    	float[] arr = new float[4];
+    	Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), arr);
+    	arr[3] = (float) color.getAlpha() / 255;
+
+    	return arr;
+	}
 }
 

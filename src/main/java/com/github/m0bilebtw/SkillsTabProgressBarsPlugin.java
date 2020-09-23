@@ -14,6 +14,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -76,6 +77,13 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 	public void onStatChanged(StatChanged statChanged) {
 		calculateAndStoreProgressToLevel(statChanged.getSkill(), statChanged.getXp());
 		calculateAndStoreProgressToGoal(statChanged.getSkill(), statChanged.getXp());
+	}
+
+	@Subscribe
+	public void onConfigChanged(ConfigChanged event) {
+		if (event.getGroup().equalsIgnoreCase(SkillsTabProgressBarsConfig.GROUP)) {
+			overlay.generateHSBAComponents();
+		}
 	}
 
 	private void calculateAndStoreProgressForAllSkillsToLevel() {
