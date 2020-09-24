@@ -5,36 +5,37 @@ import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.Range;
 import net.runelite.client.config.Alpha;
+
 import java.awt.Color;
 
 @ConfigGroup(SkillsTabProgressBarsConfig.GROUP)
 public interface SkillsTabProgressBarsConfig extends Config {
 
-	String GROUP = "skillstabprogressbars";
+    String GROUP = "skillstabprogressbars";
 
-	@Alpha
-	@ConfigItem(
-			keyName = "progressBarStartColor",
-			name = "Start color",
-			description = "The color from which the progress bar fades.",
-			position = 0
-	)
-	default Color progressBarStartColor() {
-		return new Color(0xFFFF0000);
-	}
+    @Alpha
+    @ConfigItem(
+            keyName = "progressBarStartColor",
+            name = "Start color",
+            description = "The color from which the progress bar fades.",
+            position = 0
+    )
+    default Color progressBarStartColor() {
+        return new Color(0xFFFF0000);
+    }
 
-	@Alpha
-	@ConfigItem(
-			keyName = "progressBarEndColor",
-			name = "End color",
-			description = "The color to which the progress bar fades.",
-			position = 1
-	)
-	default Color progressBarEndColor() {
-		return new Color(0xFF00FF00);
-	}
+    @Alpha
+    @ConfigItem(
+            keyName = "progressBarEndColor",
+            name = "End color",
+            description = "The color to which the progress bar fades.",
+            position = 1
+    )
+    default Color progressBarEndColor() {
+        return new Color(0xFF00FF00);
+    }
 
-	@Alpha
+    @Alpha
     @ConfigItem(
             keyName = "backgroundColor",
             name = "Background color",
@@ -89,26 +90,26 @@ public interface SkillsTabProgressBarsConfig extends Config {
         return false;
     }
 
-	@Alpha
-	@ConfigItem(
-			keyName = "goalBarStartColor",
-			name = "Goal start color",
-			description = "The color from which the goal bar fades.",
-			position = 7
-	)
-	default Color goalBarStartColor() {
-		return new Color(0xFF0000FF);
-	}
+    @Alpha
+    @ConfigItem(
+            keyName = "goalBarStartColor",
+            name = "Goal start color",
+            description = "The color from which the goal bar fades.",
+            position = 7
+    )
+    default Color goalBarStartColor() {
+        return new Color(0xFF0000FF);
+    }
 
-	@Alpha
-	@ConfigItem(
-			keyName = "goalBarEndColor",
-			name = "Goal end color",
-			description = "The color to which the goal bar fades.",
-			position = 8
-	)
-	default Color goalBarEndColor() {
-		return new Color(0xFFFF0080);
-	}
+    @Alpha
+    @ConfigItem(
+            keyName = "goalBarEndColor",
+            name = "Goal end color",
+            description = "The color to which the goal bar fades.",
+            position = 8
+    )
+    default Color goalBarEndColor() {
+        return new Color(0xFFFF0080);
+    }
 }
 

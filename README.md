@@ -3,8 +3,7 @@
 Adds progress bars to the skills tab to show how close the next level ups are
 
 Config options include 
-- draw bar backgrounds toggle
-- transparency toggle
+- full colour customisation (Thanks to https://github.com/Matthew-nop)
 - option to indent to match skill panel corners
 - adjustable bar height
 - showing for virtual levels
