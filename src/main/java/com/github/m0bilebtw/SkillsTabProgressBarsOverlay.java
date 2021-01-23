@@ -61,6 +61,10 @@ public class SkillsTabProgressBarsOverlay extends Overlay {
                 // Skip if hovering a skill that isn't this one
                 continue;
             }
+            if (config.showOnlyOnHover() && hoveredSkill != skill) {
+                // Skip if not hovering any, or hovering a different one, given config option enabled (does not skip if hovering this one)
+                continue;
+            }
 
             Rectangle bounds = skillWidget.getBounds();
             final int effectiveBoundsWidth = (int) bounds.getWidth() - (indent ? 2 * INDENT_WIDTH_ONE_SIDE : 0);
