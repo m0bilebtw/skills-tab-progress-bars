@@ -9,7 +9,5 @@ Config options include
 - showing for virtual levels
 - showing for goals set using the in-game XP menu
 
-While hovering a skill, all progress bars except the one for that skill are hidden.
-This avoids bars covering the tooltips and their text, which otherwise would happen because
-there is no layer available between the skills themselves and their tooltips,
-so we must draw on top of it all.
+Thanks to a **major** rewrite by https://github.com/Hydrox6, this plugin now uses Jagex Widgets instead of a Runelite
+overlay, meaning it can now always render all the bars, and appear *beneath* the XP information tooltips.
