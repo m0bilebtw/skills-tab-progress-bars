@@ -31,6 +31,7 @@ import java.awt.Color;
 public class SkillsTabProgressBarsPlugin extends Plugin {
 
 	private static final int SCRIPTID_STATS_INIT = 393;
+	private static final int SCRIPTID_STATS_SKILLTOTAL = 396;
 
 	static final int MINIMUM_BAR_HEIGHT = 1;
 	static final int MAXIMUM_BAR_HEIGHT = 32;
@@ -47,6 +48,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 	private SkillsTabProgressBarsConfig config;
 
 	private Widget currentWidget;
+	private SkillBarWidgetGrouping currentHovered;
 	private SkillBarWidgetGrouping[] skillBars = new SkillBarWidgetGrouping[SkillData.values().length];
 
 	private float[] progressStartHSB;
@@ -88,6 +90,9 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 				case "goalBarEndColor":
 					goalEndHSB = null;
 					break;
+				case "showOnHover":
+					handleContainerListener();
+					break;
 			}
 			// Force an update to bar size and colours
 			updateSkillBars();
@@ -104,10 +109,14 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 
 	@Subscribe
 	public void onScriptPostFired(ScriptPostFired event) {
-		if (event.getScriptId() != SCRIPTID_STATS_INIT || currentWidget == null) {
-			return;
+		if (event.getScriptId() == SCRIPTID_STATS_INIT && currentWidget != null) {
+			buildSkillBar(currentWidget);;
 		}
-		buildSkillBar(currentWidget);
+		// Add the container listener after all the other bars have been created
+		// There's no specific reason to do it after, but this will always fire once on creation of the skills tab
+		else if (event.getScriptId() == SCRIPTID_STATS_SKILLTOTAL) {
+			handleContainerListener();
+		}
 	}
 
 	/**
@@ -122,6 +131,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 		for (Widget skillTile : skillsContainer.getStaticChildren()) {
 			buildSkillBar(skillTile);
 		}
+		handleContainerListener();
 	}
 
 	private void removeSkillBars() {
@@ -130,6 +140,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 				continue;
 			}
 			Widget parent = grouping.getBarBackground().getParent();
+			removeHoverListener(parent, grouping);
 			Widget[] children = parent.getChildren();
 			for (int i = 0; i < children.length; i++) {
 				Widget child = children[i];
@@ -138,6 +149,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 				}
 			}
 		}
+		removeContainerListener();
 		skillBars = new SkillBarWidgetGrouping[SkillData.values().length];
 	}
 
@@ -186,7 +198,119 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 		goalForeground.setOnVarTransmitListener(updateCallback);
 
 		updateSkillBar(skill, grouping);
+		handleHoverListener(parent, grouping);
 		skillBars[idx] = grouping;
+	}
+
+	/**
+	 * Add or remove hover listeners on the provided widget.
+	 *
+	 * @param parent The widget containing the skill information and bars
+	 * @param grouping The collection of widgets representing the bars
+	 */
+	private void handleHoverListener(Widget parent, SkillBarWidgetGrouping grouping) {
+		if (config.showOnHover()) {
+			addHoverListener(parent, grouping);
+		}
+		else {
+			removeHoverListener(parent, grouping);
+		}
+	}
+
+	/**
+	 * See {@link #handleHoverListener}
+	 */
+	private void addHoverListener(Widget parent, SkillBarWidgetGrouping grouping) {
+		Widget barBackground = grouping.getBarBackground();
+		Widget barForeground = grouping.getBarForeground();
+		Widget goalBackground = grouping.getGoalBackground();
+		Widget goalForeground = grouping.getGoalForeground();
+
+		barBackground.setHidden(true);
+		barForeground.setHidden(true);
+		goalBackground.setHidden(true);
+		goalForeground.setHidden(true);
+
+		parent.setOnMouseOverListener((JavaScriptCallback) ev -> {
+			// We need to hide the old hovered widgets so there aren't multiple visible
+			// when moving the mouse between skills.
+			if (currentHovered != null) {
+				currentHovered.getBarBackground().setHidden(true);
+				currentHovered.getBarForeground().setHidden(true);
+				currentHovered.getGoalBackground().setHidden(true);
+				currentHovered.getGoalForeground().setHidden(true);
+			}
+			currentHovered = grouping;
+			barBackground.setHidden(false);
+			barForeground.setHidden(false);
+			goalBackground.setHidden(false);
+			goalForeground.setHidden(false);
+		});
+
+		parent.setHasListener(true);
+	}
+
+	/**
+	 * See {@link #handleHoverListener}
+	 */
+	private void removeHoverListener(Widget parent, SkillBarWidgetGrouping grouping) {
+		Widget barBackground = grouping.getBarBackground();
+		Widget barForeground = grouping.getBarForeground();
+		Widget goalBackground = grouping.getGoalBackground();
+		Widget goalForeground = grouping.getGoalForeground();
+
+		barBackground.setHidden(false);
+		barForeground.setHidden(false);
+		goalBackground.setHidden(false);
+		goalForeground.setHidden(false);
+
+		parent.setOnMouseOverListener((Object[]) null);
+	}
+
+	/**
+	 * Add or remove a listener to hide the currently visible bar if needed.
+	 * This needs to be added to the container as each of the skills use {@link Widget#setOnMouseLeaveListener}
+	 * to handle the vanilla tooltip destruction.
+	 */
+	private void handleContainerListener() {
+		if (config.showOnHover()) {
+			addContainerListener();
+		}
+		else {
+			removeContainerListener();
+		}
+	}
+
+	/**
+	 * See {@link #handleContainerListener}
+	 */
+	private void addContainerListener() {
+		Widget container = client.getWidget(WidgetInfo.SKILLS_CONTAINER);
+		if (container == null) {
+			return;
+		}
+
+		container.setOnMouseLeaveListener((JavaScriptCallback) ev -> {
+			if (currentHovered != null) {
+				currentHovered.getBarBackground().setHidden(true);
+				currentHovered.getBarForeground().setHidden(true);
+				currentHovered.getGoalBackground().setHidden(true);
+				currentHovered.getGoalForeground().setHidden(true);
+			}
+			currentHovered = null;
+		});
+		container.setHasListener(true);
+	}
+
+	/**
+	 * See {@link #handleContainerListener}
+	 */
+	private void removeContainerListener() {
+		Widget container = client.getWidget(WidgetInfo.SKILLS_CONTAINER);
+		if (container == null) {
+			return;
+		}
+		container.setOnMouseLeaveListener((Object[]) null);
 	}
 
 	/**
@@ -199,6 +323,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 				SkillBarWidgetGrouping widgets = skillBars[i];
 				if (widgets != null) {
 					updateSkillBar(skill, widgets);
+					handleHoverListener(widgets.getBarBackground().getParent(), widgets);
 				}
 			}
 		});
@@ -235,18 +360,19 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 			maxWidth -= INDENT_WIDTH_ONE_SIDE * 2;
 		}
 
-		final boolean shouldRenderNormalBar = currentLevel < Experience.MAX_REAL_LEVEL || config.virtualLevels();
-		final boolean shouldRenderGoalBar = goalEndXP > 0 && config.showGoals();
+		final boolean shouldCalculateNormalBar = currentLevel < Experience.MAX_REAL_LEVEL || config.virtualLevels();
+		final boolean shouldCalculateGoalBar = goalEndXP > 0 && config.showGoals();
+		final boolean shouldRenderAnyBars = !config.showOnHover() || grouping == currentHovered;
 
 		int barHeight = config.barHeight();
 		// If both bars are being drawn, drawn them at half height if their height would exceed the top of the widget
-		if (barHeight > MAXIMUM_BAR_HEIGHT / 2 && shouldRenderNormalBar && shouldRenderGoalBar)	{
+		if (barHeight > MAXIMUM_BAR_HEIGHT / 2 && shouldCalculateNormalBar && shouldCalculateGoalBar)	{
 			barHeight /= 2;
 		}
 
-		if (shouldRenderNormalBar)	{
-			barBackground.setHidden(false);
-			barForeground.setHidden(false);
+		if (shouldCalculateNormalBar)	{
+			barBackground.setHidden(!shouldRenderAnyBars);
+			barForeground.setHidden(!shouldRenderAnyBars);
 
 			barBackground.setOriginalX(startX);
 			barBackground.setOriginalY(0);
@@ -264,16 +390,17 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 			barForeground.setTextColor(lerpHSB(getProgressStartHSB(), getProgressEndHSB(), barPercent)); // interpolate between start and end
 			barForeground.setOpacity(255 - lerpAlpha(config.progressBarStartColor(), config.progressBarEndColor(), barPercent));
 		} else {
-			barBackground.setHidden(true);
-			barForeground.setHidden(true);
+			// Set the bars to be invisible so they don't conflict with the hover hiding
+			barBackground.setOpacity(255);
+			barForeground.setOpacity(255);
 		}
 
 
-		if (shouldRenderGoalBar) {
-			final int yPos = barHeight * (shouldRenderNormalBar ? 1 : 0);
+		if (shouldCalculateGoalBar) {
+			final int yPos = barHeight * (shouldCalculateNormalBar ? 1 : 0);
 
-			goalBackground.setHidden(false);
-			goalForeground.setHidden(false);
+			goalBackground.setHidden(!shouldRenderAnyBars);
+			goalForeground.setHidden(!shouldRenderAnyBars);
 
 			goalBackground.setOriginalX(startX);
 			goalBackground.setOriginalY(yPos);
@@ -291,8 +418,9 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 			goalForeground.setTextColor(lerpHSB(getGoalStartHSB(), getGoalEndHSB(), goalPercent)); // interpolate between start and end
 			goalForeground.setOpacity(255 - lerpAlpha(config.goalBarStartColor(), config.goalBarEndColor(), goalPercent));
 		} else {
-			goalBackground.setHidden(true);
-			goalForeground.setHidden(true);
+			// Set the bars to be invisible so they don't conflict with the hover hiding
+			goalBackground.setOpacity(255);
+			goalForeground.setOpacity(255);
 		}
 		barBackground.revalidate();
 		barForeground.revalidate();
