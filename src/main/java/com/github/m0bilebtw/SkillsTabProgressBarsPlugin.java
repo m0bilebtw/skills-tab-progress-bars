@@ -113,8 +113,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 	/**
 	 * If the plugin is started after the skill panel has been built, this will add the bar widgets that are needed.
 	 */
-	private void buildSkillBars()
-	{
+	private void buildSkillBars() {
 		Widget skillsContainer = client.getWidget(WidgetInfo.SKILLS_CONTAINER);
 		if (skillsContainer == null) {
 			return;
@@ -125,8 +124,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 		}
 	}
 
-	private void removeSkillBars()
-	{
+	private void removeSkillBars() {
 		for (SkillBarWidgetGrouping grouping : skillBars) {
 			if (grouping == null) {
 				continue;
@@ -145,7 +143,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 
 	/**
 	 * Create the widgets needed for the bars to exist, and keep a reference to them
-	 * Setting their position, size, and colour is done in {@link SkillsTabProgressBarsPlugin#updateSkillBar}
+	 * Setting their position, size, and colour is done in {@link #updateSkillBar}
 	 *
 	 * @param parent The parent widget inside which the skill bar is created
 	 */
@@ -178,16 +176,17 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 		goalForeground.setFilled(true);
 		goalForeground.setHasListener(true);
 
-		JavaScriptCallback updateCallback = ev ->
-			updateSkillBar(skill, barBackground, barForeground, goalBackground, goalForeground);
+		SkillBarWidgetGrouping grouping = new SkillBarWidgetGrouping(barBackground, barForeground, goalBackground, goalForeground);
+
+		JavaScriptCallback updateCallback = ev -> updateSkillBar(skill, grouping);
 
 		barBackground.setOnVarTransmitListener(updateCallback);
 		barForeground.setOnVarTransmitListener(updateCallback);
 		goalBackground.setOnVarTransmitListener(updateCallback);
 		goalForeground.setOnVarTransmitListener(updateCallback);
 
-		updateSkillBar(skill, barBackground, barForeground, goalBackground, goalForeground);
-		skillBars[idx] = new SkillBarWidgetGrouping(barBackground, barForeground, goalBackground, goalForeground);
+		updateSkillBar(skill, grouping);
+		skillBars[idx] = grouping;
 	}
 
 	/**
@@ -199,10 +198,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 				SkillData skill = SkillData.get(i);
 				SkillBarWidgetGrouping widgets = skillBars[i];
 				if (widgets != null) {
-					updateSkillBar(skill,
-						widgets.getBarBackground(), widgets.getBarForeground(),
-						widgets.getGoalBackground(), widgets.getGoalForeground()
-					);
+					updateSkillBar(skill, widgets);
 				}
 			}
 		});
@@ -211,14 +207,15 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 	/**
 	 * Update a specific skill's bar
 	 * @param skill The skill to be updated
-	 * @param barBackground The level progress bar background widget
-	 * @param barForeground The level progress bar foreground widget
-	 * @param goalBackground The goal progress bar background widget
-	 * @param goalForeground The goal progress bar foreground widget
+	 * @param grouping The collection of widgets to represent the progress and goal bars
 	 */
 	private void updateSkillBar(SkillData skill,
-								Widget barBackground, Widget barForeground,
-								Widget goalBackground, Widget goalForeground) {
+								SkillBarWidgetGrouping grouping) {
+		Widget barBackground = grouping.getBarBackground();
+		Widget barForeground = grouping.getBarForeground();
+		Widget goalBackground = grouping.getGoalBackground();
+		Widget goalForeground = grouping.getGoalForeground();
+
 		final int currentXP = client.getSkillExperience(skill.getSkill());
 		final int currentLevel = Experience.getLevelForXp(currentXP);
 		final int currentLevelXP = Experience.getXpForLevel(currentLevel);
