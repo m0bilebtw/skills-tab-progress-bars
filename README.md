@@ -8,6 +8,7 @@ Config options include
 - adjustable bar height
 - showing for virtual levels
 - showing for goals set using the in-game XP menu
+- showing only for the skill you are currently hovering over to reduce clutter
 
 Thanks to a **major** rewrite by https://github.com/Hydrox6, this plugin now uses Jagex Widgets instead of a Runelite
 overlay, meaning it can now always render all the bars, and appear *beneath* the XP information tooltips.

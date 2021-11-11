@@ -91,7 +91,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
     }
 
     @ConfigItem(
-        keyName = "showOnHover",
+        keyName = "showOnlyOnHover",
         name = "Only show when hovered",
         description = "Only show the progress bars and goals for a skill when it is being hovered over.",
         position = 7
