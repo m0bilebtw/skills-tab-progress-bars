@@ -90,6 +90,16 @@ public interface SkillsTabProgressBarsConfig extends Config {
         return false;
     }
 
+    @ConfigItem(
+        keyName = "showOnHover",
+        name = "Only show when hovered",
+        description = "Only show the progress bars and goals for a skill when it is being hovered over.",
+        position = 7
+    )
+    default boolean showOnHover() {
+        return false;
+    }
+
     @Alpha
     @ConfigItem(
             keyName = "goalBarStartColor",
