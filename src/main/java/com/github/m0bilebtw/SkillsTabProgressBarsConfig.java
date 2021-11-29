@@ -52,10 +52,20 @@ public interface SkillsTabProgressBarsConfig extends Config {
     }
 
     @ConfigItem(
+            keyName = "grayOut99",
+            name = "Darken skills at 99",
+            description = "Show levels at 99 as darker than the others.",
+            position = 4
+    )
+    default boolean grayOut99() {
+        return false;
+    }
+
+    @ConfigItem(
             keyName = "showGoals",
             name = "Show goals progress",
             description = "Show progress towards the goals you set using the in-game XP menu in addition to progress towards individual levels.",
-            position = 4
+            position = 5
     )
     default boolean showGoals() {
         return false;
@@ -65,7 +75,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
             keyName = "showOnlyGoals",
             name = "Show ONLY goals progress",
             description = "Hides progress towards individual levels leaving only goals progress.",
-            position = 5
+            position = 6
     )
     default boolean showOnlyGoals() {
         return false;
@@ -75,7 +85,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
             keyName = "showOnlyOnHover",
             name = "Only show when hovered",
             description = "Only show the progress bars and goals for a skill when it is being hovered over.",
-            position = 6
+            position = 7
     )
     default boolean showOnHover() {
         return false;
@@ -139,6 +149,21 @@ public interface SkillsTabProgressBarsConfig extends Config {
     )
     default Color goalBarEndColor() {
         return new Color(0xFFFF0080);
+    }
+
+    @Range(
+            min = 0,
+            max = 255
+    )
+    @ConfigItem(
+            keyName = "grayOutOpacity",
+            name = "Darken skills opacity",
+            description = "Controls how dark skills are when level 99, and 'Darken skills at 99' is turned on.",
+            section = sectionColours,
+            position = 6
+    )
+    default int grayOutOpacity() {
+        return 127;
     }
 }
 

@@ -31,6 +31,7 @@ import net.runelite.api.widgets.Widget;
 @Data
 @AllArgsConstructor
 class SkillBarWidgetGrouping {
+	private Widget grayOut99;
 	private Widget barBackground;
 	private Widget barForeground;
 	private Widget goalBackground;
@@ -38,6 +39,7 @@ class SkillBarWidgetGrouping {
 
 	boolean contains(Widget other) {
 		return other == barBackground || other == barForeground
-			|| other == goalBackground || other == goalForeground;
+			|| other == goalBackground || other == goalForeground
+			|| other == grayOut99;
 	}
 }

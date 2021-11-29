@@ -25,7 +25,7 @@ import java.awt.Color;
 @PluginDescriptor(
 		name = "Skills Progress Bars",
 		description = "Adds progress bars to the skills tab to show how close the next level ups are",
-		tags = {"skills", "stats", "levels", "progress", "bars"}
+		tags = {"skills", "stats", "levels", "goals", "progress", "bars"}
 )
 @Slf4j
 public class SkillsTabProgressBarsPlugin extends Plugin {
@@ -110,7 +110,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 	@Subscribe
 	public void onScriptPostFired(ScriptPostFired event) {
 		if (event.getScriptId() == SCRIPTID_STATS_INIT && currentWidget != null) {
-			buildSkillBar(currentWidget);;
+			buildSkillBar(currentWidget);
 		}
 		// Add the container listener after all the other bars have been created
 		// There's no specific reason to do it after, but this will always fire once on creation of the skills tab
@@ -166,6 +166,17 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 			return;
 		}
 
+		Widget grayOut99 = parent.createChild(-1, WidgetType.RECTANGLE);
+		grayOut99.setXPositionMode(WidgetPositionMode.ABSOLUTE_CENTER);
+		grayOut99.setYPositionMode(WidgetPositionMode.ABSOLUTE_CENTER);
+		grayOut99.setWidthMode(WidgetSizeMode.MINUS);
+		grayOut99.setHeightMode(WidgetSizeMode.MINUS);
+		grayOut99.setOriginalWidth(0);
+		grayOut99.setOriginalHeight(0);
+		grayOut99.setFilled(true);
+		grayOut99.setHasListener(true);
+		grayOut99.setTextColor(Color.BLACK.getRGB());
+
 		Widget barBackground = parent.createChild(-1, WidgetType.RECTANGLE);
 		barBackground.setYPositionMode(WidgetPositionMode.ABSOLUTE_BOTTOM);
 		barBackground.setWidthMode(WidgetSizeMode.MINUS);
@@ -188,10 +199,11 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 		goalForeground.setFilled(true);
 		goalForeground.setHasListener(true);
 
-		SkillBarWidgetGrouping grouping = new SkillBarWidgetGrouping(barBackground, barForeground, goalBackground, goalForeground);
+		SkillBarWidgetGrouping grouping = new SkillBarWidgetGrouping(grayOut99, barBackground, barForeground, goalBackground, goalForeground);
 
 		JavaScriptCallback updateCallback = ev -> updateSkillBar(skill, grouping);
 
+		grayOut99.setOnVarTransmitListener(updateCallback);
 		barBackground.setOnVarTransmitListener(updateCallback);
 		barForeground.setOnVarTransmitListener(updateCallback);
 		goalBackground.setOnVarTransmitListener(updateCallback);
@@ -221,11 +233,13 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 	 * See {@link #handleHoverListener}
 	 */
 	private void addHoverListener(Widget parent, SkillBarWidgetGrouping grouping) {
+		Widget grayOut99 = grouping.getGrayOut99();
 		Widget barBackground = grouping.getBarBackground();
 		Widget barForeground = grouping.getBarForeground();
 		Widget goalBackground = grouping.getGoalBackground();
 		Widget goalForeground = grouping.getGoalForeground();
 
+		grayOut99.setHidden(true);
 		barBackground.setHidden(true);
 		barForeground.setHidden(true);
 		goalBackground.setHidden(true);
@@ -235,12 +249,14 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 			// We need to hide the old hovered widgets so there aren't multiple visible
 			// when moving the mouse between skills.
 			if (currentHovered != null) {
+				currentHovered.getGrayOut99().setHidden(true);
 				currentHovered.getBarBackground().setHidden(true);
 				currentHovered.getBarForeground().setHidden(true);
 				currentHovered.getGoalBackground().setHidden(true);
 				currentHovered.getGoalForeground().setHidden(true);
 			}
 			currentHovered = grouping;
+			grayOut99.setHidden(false);
 			barBackground.setHidden(false);
 			barForeground.setHidden(false);
 			goalBackground.setHidden(false);
@@ -254,11 +270,13 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 	 * See {@link #handleHoverListener}
 	 */
 	private void removeHoverListener(Widget parent, SkillBarWidgetGrouping grouping) {
+		Widget grayOut99 = grouping.getGrayOut99();
 		Widget barBackground = grouping.getBarBackground();
 		Widget barForeground = grouping.getBarForeground();
 		Widget goalBackground = grouping.getGoalBackground();
 		Widget goalForeground = grouping.getGoalForeground();
 
+		grayOut99.setHidden(false);
 		barBackground.setHidden(false);
 		barForeground.setHidden(false);
 		goalBackground.setHidden(false);
@@ -292,6 +310,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 
 		container.setOnMouseLeaveListener((JavaScriptCallback) ev -> {
 			if (currentHovered != null) {
+				currentHovered.getGrayOut99().setHidden(true);
 				currentHovered.getBarBackground().setHidden(true);
 				currentHovered.getBarForeground().setHidden(true);
 				currentHovered.getGoalBackground().setHidden(true);
@@ -336,6 +355,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 	 */
 	private void updateSkillBar(SkillData skill,
 								SkillBarWidgetGrouping grouping) {
+		Widget grayOut99 = grouping.getGrayOut99();
 		Widget barBackground = grouping.getBarBackground();
 		Widget barForeground = grouping.getBarForeground();
 		Widget goalBackground = grouping.getGoalBackground();
@@ -360,6 +380,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 			maxWidth -= INDENT_WIDTH_ONE_SIDE * 2;
 		}
 
+		final boolean shouldGrayOut = config.grayOut99() && currentLevel >= Experience.MAX_REAL_LEVEL;
 		final boolean shouldCalculateNormalBar = !config.showOnlyGoals() && (currentLevel < Experience.MAX_REAL_LEVEL || config.virtualLevels());
 		final boolean shouldCalculateGoalBar = goalEndXP > 0 && config.showGoals();
 		final boolean shouldRenderAnyBars = !config.showOnHover() || grouping == currentHovered;
@@ -368,6 +389,13 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 		// If both bars are being drawn, drawn them at half height if their height would exceed the top of the widget
 		if (barHeight > MAXIMUM_BAR_HEIGHT / 2 && shouldCalculateNormalBar && shouldCalculateGoalBar)	{
 			barHeight /= 2;
+		}
+
+		if (shouldGrayOut) {
+			grayOut99.setOpacity(255 - config.grayOutOpacity());
+		} else {
+			// Set the gray out to be invisible so it doesn't conflict with the hover hiding
+			grayOut99.setOpacity(255);
 		}
 
 		if (shouldCalculateNormalBar)	{
@@ -422,6 +450,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 			goalBackground.setOpacity(255);
 			goalForeground.setOpacity(255);
 		}
+		grayOut99.revalidate();
 		barBackground.revalidate();
 		barForeground.revalidate();
 		goalBackground.revalidate();
