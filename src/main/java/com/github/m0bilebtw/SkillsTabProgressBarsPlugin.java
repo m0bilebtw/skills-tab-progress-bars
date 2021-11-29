@@ -360,7 +360,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 			maxWidth -= INDENT_WIDTH_ONE_SIDE * 2;
 		}
 
-		final boolean shouldCalculateNormalBar = currentLevel < Experience.MAX_REAL_LEVEL || config.virtualLevels();
+		final boolean shouldCalculateNormalBar = !config.showOnlyGoals() && (currentLevel < Experience.MAX_REAL_LEVEL || config.virtualLevels());
 		final boolean shouldCalculateGoalBar = goalEndXP > 0 && config.showGoals();
 		final boolean shouldRenderAnyBars = !config.showOnHover() || grouping == currentHovered;
 
