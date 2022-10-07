@@ -368,8 +368,8 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 			? Experience.MAX_SKILL_XP
 			: Experience.getXpForLevel(currentLevel + 1);
 
-		final int goalStartXP = client.getVar(skill.getGoalStartVarp());
-		final int goalEndXP = client.getVar(skill.getGoalEndVarp());
+		final int goalStartXP = client.getVarpValue(skill.getGoalStartVarp());
+		final int goalEndXP = client.getVarpValue(skill.getGoalEndVarp());
 
 		final double barPercent = Math.min(1.0, (currentXP - currentLevelXP) / (double)(nextLevelXP - currentLevelXP));
 		final double goalPercent = Math.min(1.0, (currentXP - goalStartXP) / (double)(goalEndXP - goalStartXP));
@@ -380,7 +380,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 			maxWidth -= INDENT_WIDTH_ONE_SIDE * 2;
 		}
 
-		final boolean shouldGrayOut = config.grayOut99() && currentLevel >= Experience.MAX_REAL_LEVEL;
+		final boolean shouldGrayOut = (config.grayOut99() && currentLevel >= Experience.MAX_REAL_LEVEL) || (config.grayOut200m() && currentLevelXP >= Experience.MAX_SKILL_XP);
 		final boolean shouldCalculateNormalBar = !config.showOnlyGoals() && (currentLevel < Experience.MAX_REAL_LEVEL || config.virtualLevels());
 		final boolean shouldCalculateGoalBar = goalEndXP > 0 && config.showGoals();
 		final boolean shouldRenderAnyBars = !config.showOnHover() || grouping == currentHovered;

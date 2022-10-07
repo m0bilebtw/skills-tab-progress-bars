@@ -62,10 +62,20 @@ public interface SkillsTabProgressBarsConfig extends Config {
     }
 
     @ConfigItem(
+            keyName = "grayOut200m",
+            name = "Darken skills at 200m xp",
+            description = "Show skills at 200million experience as darker than the others.",
+            position = 5
+    )
+    default boolean grayOut200m() {
+        return true;
+    }
+
+    @ConfigItem(
             keyName = "showGoals",
             name = "Show goals progress",
             description = "Show progress towards the goals you set using the in-game XP menu in addition to progress towards individual levels.",
-            position = 5
+            position = 6
     )
     default boolean showGoals() {
         return false;
@@ -75,7 +85,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
             keyName = "showOnlyGoals",
             name = "Show ONLY goals progress",
             description = "Hides progress towards individual levels leaving only goals progress.",
-            position = 6
+            position = 7
     )
     default boolean showOnlyGoals() {
         return false;
@@ -85,7 +95,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
             keyName = "showOnlyOnHover",
             name = "Only show when hovered",
             description = "Only show the progress bars and goals for a skill when it is being hovered over.",
-            position = 7
+            position = 8
     )
     default boolean showOnHover() {
         return false;
