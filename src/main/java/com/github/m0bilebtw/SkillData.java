@@ -28,6 +28,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.runelite.api.Skill;
 import net.runelite.api.VarPlayer;
+import net.runelite.api.annotations.Varp;
 
 @Getter
 @AllArgsConstructor
@@ -57,8 +58,8 @@ enum SkillData {
 	FARMING(Skill.FARMING, VarPlayer.FARMING_GOAL_START, VarPlayer.FARMING_GOAL_END);
 
 	private final Skill skill;
-	private final int goalStartVarp;
-	private final int goalEndVarp;
+	private final @Varp int goalStartVarp;
+	private final @Varp int goalEndVarp;
 
 	String getName() {
 		return skill.getName();
