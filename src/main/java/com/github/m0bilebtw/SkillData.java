@@ -57,8 +57,8 @@ enum SkillData {
 	FARMING(Skill.FARMING, VarPlayer.FARMING_GOAL_START, VarPlayer.FARMING_GOAL_END);
 
 	private final Skill skill;
-	private final VarPlayer goalStartVarp;
-	private final VarPlayer goalEndVarp;
+	private final int goalStartVarp;
+	private final int goalEndVarp;
 
 	String getName() {
 		return skill.getName();
