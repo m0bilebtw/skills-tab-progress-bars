@@ -12,5 +12,5 @@ Config options include
 - showing only for goals, hiding levels progress
 - showing only for the skill you are currently hovering over to reduce clutter
 
-Thanks to a **major** rewrite by https://github.com/Hydrox6, this plugin now uses Jagex Widgets instead of a Runelite
+Thanks to a **major** rewrite by https://github.com/Enriath, this plugin now uses Jagex Widgets instead of a Runelite
 overlay, meaning it can now always render all the bars, and appear *beneath* the XP information tooltips.
