@@ -7,9 +7,9 @@ import net.runelite.api.Experience;
 import net.runelite.api.GameState;
 import net.runelite.api.events.ScriptPostFired;
 import net.runelite.api.events.ScriptPreFired;
+import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.JavaScriptCallback;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.widgets.WidgetPositionMode;
 import net.runelite.api.widgets.WidgetSizeMode;
 import net.runelite.api.widgets.WidgetType;
@@ -37,6 +37,8 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 	static final int MAXIMUM_BAR_HEIGHT = 32;
 
 	private static final int INDENT_WIDTH_ONE_SIDE = 4; // The skill panel from OSRS indents 3 pixels at the bottom (and top)
+
+	private static final int WIDGET_CHILD_ID_MASK = 0xFFFF;
 
 	@Inject
 	private Client client;
@@ -123,7 +125,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 	 * If the plugin is started after the skill panel has been built, this will add the bar widgets that are needed.
 	 */
 	private void buildSkillBars() {
-		Widget skillsContainer = client.getWidget(WidgetInfo.SKILLS_CONTAINER);
+		Widget skillsContainer = client.getWidget(ComponentID.SKILLS_CONTAINER);
 		if (skillsContainer == null) {
 			return;
 		}
@@ -153,6 +155,10 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 		skillBars = new SkillBarWidgetGrouping[SkillData.values().length];
 	}
 
+	private int getChildId(int id) {
+		return id & WIDGET_CHILD_ID_MASK;
+	}
+
 	/**
 	 * Create the widgets needed for the bars to exist, and keep a reference to them
 	 * Setting their position, size, and colour is done in {@link #updateSkillBar}
@@ -160,7 +166,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 	 * @param parent The parent widget inside which the skill bar is created
 	 */
 	private void buildSkillBar(Widget parent) {
-		int idx = WidgetInfo.TO_CHILD(parent.getId()) - 1;
+		int idx = getChildId(parent.getId()) - 1;
 		SkillData skill = SkillData.get(idx);
 		if (skill == null) {
 			return;
@@ -303,7 +309,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 	 * See {@link #handleContainerListener}
 	 */
 	private void addContainerListener() {
-		Widget container = client.getWidget(WidgetInfo.SKILLS_CONTAINER);
+		Widget container = client.getWidget(ComponentID.SKILLS_CONTAINER);
 		if (container == null) {
 			return;
 		}
@@ -325,7 +331,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 	 * See {@link #handleContainerListener}
 	 */
 	private void removeContainerListener() {
-		Widget container = client.getWidget(WidgetInfo.SKILLS_CONTAINER);
+		Widget container = client.getWidget(ComponentID.SKILLS_CONTAINER);
 		if (container == null) {
 			return;
 		}
