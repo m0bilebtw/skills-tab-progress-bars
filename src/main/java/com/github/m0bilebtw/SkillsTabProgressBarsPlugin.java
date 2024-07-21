@@ -386,7 +386,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 			maxWidth -= INDENT_WIDTH_ONE_SIDE * 2;
 		}
 
-		final boolean shouldGrayOut = (config.grayOut99() && currentLevel >= Experience.MAX_REAL_LEVEL) || (config.grayOut200m() && currentLevelXP >= Experience.MAX_SKILL_XP);
+		final boolean shouldGrayOut = (config.grayOut99() && currentLevel >= Experience.MAX_REAL_LEVEL) || (config.grayOut200m() && currentXP >= Experience.MAX_SKILL_XP);
 		final boolean shouldCalculateNormalBar = !config.showOnlyGoals() && (currentLevel < Experience.MAX_REAL_LEVEL || config.virtualLevels()) && currentLevelXP < Experience.MAX_SKILL_XP;
 		final boolean shouldCalculateGoalBar = goalEndXP > 0 && config.showGoals();
 		final boolean shouldRenderAnyBars = !config.showOnHover() || grouping == currentHovered;
@@ -541,4 +541,3 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 		return arr;
 	}
 }
-
