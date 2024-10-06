@@ -1,4 +1,4 @@
-# Skills Tab Progress Bars [![Plugin Installs](http://img.shields.io/endpoint?url=https://i.pluginhub.info/shields/installs/plugin/skills-tab-progress-bars)](https://runelite.net/plugin-hub/m0bile%20btw) [![Plugin Rank](http://img.shields.io/endpoint?url=https://i.pluginhub.info/shields/rank/plugin/skills-tab-progress-bars)](https://runelite.net/plugin-hub)
+# Skills Tab Progress Bars [![Plugin Installs](http://img.shields.io/endpoint?url=https://api.runelite.net/pluginhub/shields/installs/plugin/skills-tab-progress-bars)](https://runelite.net/plugin-hub/m0bile%20btw) [![Plugin Rank](http://img.shields.io/endpoint?url=https://api.runelite.net/pluginhub/shields/rank/plugin/skills-tab-progress-bars)](https://runelite.net/plugin-hub)
 ##### A plugin for [RuneLite](https://runelite.net/)
 Adds progress bars to the skills tab to show how close the next level ups are
 
