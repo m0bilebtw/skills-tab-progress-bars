@@ -105,7 +105,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
         return true;
     }
 
-    String DARKEN_SETTINGS_MIGRATED_KEY = "darkenMigratedToEnumSystem-testing2";
+    String DARKEN_SETTINGS_MIGRATED_KEY = "darkenMigratedToEnumSystem";
 
     @ConfigItem(
             keyName = DARKEN_SETTINGS_MIGRATED_KEY,
