@@ -371,6 +371,23 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 		});
 	}
 
+	private boolean shouldDarken(int currentLevel, int currentXP) {
+		switch (config.darkenType()) {
+			case None:
+				return false;
+			case Level99:
+				return currentLevel >= Experience.MAX_REAL_LEVEL;
+			case LevelCustom:
+				return currentLevel >= config.darkenCustomLevel();
+			case XP200m:
+				return currentXP >= Experience.MAX_SKILL_XP;
+			case XPCustom:
+				return currentXP >= config.darkenCustomXP();
+		}
+
+		return false;
+	}
+
 	/**
 	 * Update a specific skill's bar
 	 * @param skill The skill to be updated
@@ -403,7 +420,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 			maxWidth -= INDENT_WIDTH_ONE_SIDE * 2;
 		}
 
-		final boolean shouldGrayOut = (config.grayOut99() && currentLevel >= Experience.MAX_REAL_LEVEL) || (config.grayOut200m() && currentXP >= Experience.MAX_SKILL_XP);
+		final boolean shouldGrayOut = shouldDarken(currentLevel, currentXP);
 		final boolean shouldCalculateNormalBar = !config.showOnlyGoals() && (currentLevel < Experience.MAX_REAL_LEVEL || config.virtualLevels()) && currentLevelXP < Experience.MAX_SKILL_XP;
 		final boolean shouldCalculateGoalBar = goalEndXP > 0 && config.showGoals();
 		final boolean shouldRenderAnyBars = !config.showOnHover() || grouping == currentHovered;
