@@ -1,5 +1,6 @@
 package com.github.m0bilebtw;
 
+import net.runelite.api.Experience;
 import net.runelite.client.config.*;
 
 import java.awt.Color;
@@ -8,14 +9,6 @@ import java.awt.Color;
 public interface SkillsTabProgressBarsConfig extends Config {
 
     String GROUP = "skillstabprogressbars";
-
-    @ConfigSection(
-            name = "Bar Colours",
-            description = "Settings for level and goal progress bar colours.",
-            position = 20
-    )
-    String sectionColours = "Bar Colours";
-
 
     @ConfigItem(
             keyName = "indent",
@@ -52,26 +45,6 @@ public interface SkillsTabProgressBarsConfig extends Config {
     }
 
     @ConfigItem(
-            keyName = "grayOut99",
-            name = "Darken skills at 99",
-            description = "Show levels at 99 as darker than the others.",
-            position = 4
-    )
-    default boolean grayOut99() {
-        return false;
-    }
-
-    @ConfigItem(
-            keyName = "grayOut200m",
-            name = "Darken skills at 200m xp",
-            description = "Show skills at 200million experience as darker than the others.",
-            position = 5
-    )
-    default boolean grayOut200m() {
-        return true;
-    }
-
-    @ConfigItem(
             keyName = "showGoals",
             name = "Show goals progress",
             description = "Show progress towards the goals you set using the in-game XP menu in addition to progress towards individual levels.",
@@ -100,6 +73,111 @@ public interface SkillsTabProgressBarsConfig extends Config {
     default boolean showOnHover() {
         return false;
     }
+
+    @ConfigSection(
+            name = "Darken",
+            description = "Settings for darkening skills as certain thresholds.",
+            position = 10
+    )
+    String sectionDarken = "Darken";
+
+    @Deprecated
+    @ConfigItem(
+            keyName = "grayOut99",
+            name = "Darken skills at 99",
+            description = "Show levels at 99 as darker than the others.",
+            hidden = true,
+            section = sectionDarken
+    )
+    default boolean grayOut99() {
+        return false;
+    }
+
+    @Deprecated
+    @ConfigItem(
+            keyName = "grayOut200m",
+            name = "Darken skills at 200m xp",
+            description = "Show skills at 200million experience as darker than the others.",
+            hidden = true,
+            section = sectionDarken
+    )
+    default boolean grayOut200m() {
+        return true;
+    }
+
+    String DARKEN_SETTINGS_MIGRATED_KEY = "darkenMigratedToEnumSystem-testing2";
+    @ConfigItem(
+            keyName = DARKEN_SETTINGS_MIGRATED_KEY,
+            name = "Darken migrated to enum system",
+            description = "Whether the skill darkening settings have yet been migrated to the new DarkenType enum system.",
+            hidden = true,
+            section = sectionDarken
+    )
+    default boolean darkenMigratedToEnumSystem() {
+        return false;
+    }
+
+    String DARKEN_SETTINGS_ENUM_KEY = "darkenType";
+    @ConfigItem(
+            keyName = DARKEN_SETTINGS_ENUM_KEY,
+            name = "Darken skills",
+            description = "When, if ever, should a skill stone be darkened?",
+            position = 1,
+            section = sectionDarken
+    )
+    default DarkenType darkenType() {
+        return DarkenType.XP200m;
+    }
+
+    @Range(
+            max = 255
+    )
+    @ConfigItem(
+            keyName = "grayOutOpacity",
+            name = "Darken skills opacity",
+            description = "Controls how dark skills get when darkened, either by level or XP limits.",
+            section = sectionDarken,
+            position = 2
+    )
+    default int darkenOpacity() {
+        return 127;
+    }
+
+    @Range(
+            max = Experience.MAX_VIRT_LEVEL
+    )
+    @ConfigItem(
+            keyName = "darkenCustomLevel",
+            name = "Custom darken level",
+            description = "If Darken skills is set to Custom Level, this is the override value to use.",
+            section = sectionDarken,
+            position = 3
+
+    )
+    default int darkenCustomLevel() {
+        return Experience.MAX_REAL_LEVEL;
+    }
+
+    @Range(
+            max = Experience.MAX_SKILL_XP
+    )
+    @ConfigItem(
+            keyName = "darkenCustomXP",
+            name = "Custom darken XP",
+            description = "If Darken skills is set to Custom XP, this is the override value to use.",
+            section = sectionDarken,
+            position = 4
+    )
+    default int darkenCustomXP() {
+        return Experience.getXpForLevel(Experience.MAX_REAL_LEVEL);
+    }
+
+    @ConfigSection(
+            name = "Bar Colours",
+            description = "Settings for level and goal progress bar colours.",
+            position = 20
+    )
+    String sectionColours = "Bar Colours";
 
     @Alpha
     @ConfigItem(
@@ -159,21 +237,6 @@ public interface SkillsTabProgressBarsConfig extends Config {
     )
     default Color goalBarEndColor() {
         return new Color(0xFFFF0080);
-    }
-
-    @Range(
-            min = 0,
-            max = 255
-    )
-    @ConfigItem(
-            keyName = "grayOutOpacity",
-            name = "Darken skills opacity",
-            description = "Controls how dark skills are when level 99, and 'Darken skills at 99' is turned on.",
-            section = sectionColours,
-            position = 6
-    )
-    default int grayOutOpacity() {
-        return 127;
     }
 }
 

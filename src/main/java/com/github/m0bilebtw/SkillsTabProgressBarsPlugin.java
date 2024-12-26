@@ -22,10 +22,13 @@ import net.runelite.client.plugins.PluginDescriptor;
 import javax.inject.Inject;
 import java.awt.Color;
 
+import static com.github.m0bilebtw.SkillsTabProgressBarsConfig.DARKEN_SETTINGS_ENUM_KEY;
+import static com.github.m0bilebtw.SkillsTabProgressBarsConfig.DARKEN_SETTINGS_MIGRATED_KEY;
+
 @PluginDescriptor(
 		name = "Skills Progress Bars",
 		description = "Adds progress bars to the skills tab to show how close the next level ups are",
-		tags = {"skills", "stats", "levels", "goals", "progress", "bars"}
+		tags = {"skills", "stats", "levels", "goals", "progress", "bars", "darken"}
 )
 @Slf4j
 public class SkillsTabProgressBarsPlugin extends Plugin {
@@ -49,6 +52,9 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 	@Inject
 	private SkillsTabProgressBarsConfig config;
 
+	@Inject
+	private ConfigManager configManager;
+
 	private Widget currentWidget;
 	private SkillBarWidgetGrouping currentHovered;
 	private SkillBarWidgetGrouping[] skillBars = new SkillBarWidgetGrouping[SkillData.values().length];
@@ -60,6 +66,8 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 
 	@Override
 	protected void startUp() {
+		migrateConfigToEnumSystemIfNeeded();
+
 		if (client.getGameState() == GameState.LOGGED_IN) {
 			clientThread.invoke(this::buildSkillBars);
 		}
@@ -73,6 +81,15 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 	@Provides
 	SkillsTabProgressBarsConfig provideConfig(ConfigManager configManager) {
 		return configManager.getConfig(SkillsTabProgressBarsConfig.class);
+	}
+
+	private void migrateConfigToEnumSystemIfNeeded() {
+		if (config.darkenMigratedToEnumSystem())
+			return;
+
+		DarkenType darkenType = DarkenType.migrate(config);
+		configManager.setConfiguration(SkillsTabProgressBarsConfig.GROUP, DARKEN_SETTINGS_ENUM_KEY, darkenType);
+		configManager.setConfiguration(SkillsTabProgressBarsConfig.GROUP, DARKEN_SETTINGS_MIGRATED_KEY, true);
 	}
 
 	@Subscribe
@@ -398,7 +415,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 		}
 
 		if (shouldGrayOut) {
-			grayOut99.setOpacity(255 - config.grayOutOpacity());
+			grayOut99.setOpacity(255 - config.darkenOpacity());
 		} else {
 			// Set the gray out to be invisible so it doesn't conflict with the hover hiding
 			grayOut99.setOpacity(255);

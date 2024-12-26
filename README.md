@@ -7,7 +7,7 @@ Config options include
 - option to indent to match skill panel corners
 - adjustable bar height
 - showing for virtual levels
-- darkening skills at lvl 99 and/or 200m XP to easily see skills that still need work
+- darkening skills at lvl 99, 200m XP, or custom thresholds to easily see skills that still need work
 - showing for goals set using the in-game XP menu
 - showing only for goals, hiding levels progress
 - showing only for the skill you are currently hovering over to reduce clutter
