@@ -20,10 +20,10 @@ public enum DarkenType {
     }
 
     public static DarkenType migrate(SkillsTabProgressBarsConfig config) {
-        if (config.grayOut200m())
-            return DarkenType.XP200m;
-        else if (config.grayOut99())
+        if (config.grayOut99())
             return DarkenType.Level99;
+        else if (config.grayOut200m())
+            return DarkenType.XP200m;
         else
             return DarkenType.None;
     }
