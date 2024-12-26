@@ -45,6 +45,16 @@ public interface SkillsTabProgressBarsConfig extends Config {
     }
 
     @ConfigItem(
+            keyName = "stillShowAt200m",
+            name = "Still show at 200m",
+            description = "Show full progress bar at 200m XP. This was previous unintentional behaviour, kept available for those that want it.",
+            position = 4
+    )
+    default boolean stillShowAt200m() {
+        return false;
+    }
+
+    @ConfigItem(
             keyName = "showGoals",
             name = "Show goals progress",
             description = "Show progress towards the goals you set using the in-game XP menu in addition to progress towards individual levels.",
@@ -172,6 +182,28 @@ public interface SkillsTabProgressBarsConfig extends Config {
     )
     default int darkenCustomXP() {
         return Experience.getXpForLevel(Experience.MAX_REAL_LEVEL);
+    }
+
+    @ConfigItem(
+            keyName = "hideProgressBarWhenDarkened",
+            name = "Hide progress bar if darkened",
+            description = "If a skill is darkened by a level or XP threshold, this option will also hide its progress bar.",
+            section = sectionDarken,
+            position = 5
+    )
+    default boolean hideProgressBarWhenDarkened() {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "hideGoalBarWhenDarkened",
+            name = "Hide goal bar if darkened",
+            description = "If a skill is darkened by a level or XP threshold, this option will also hide its goal bar.",
+            section = sectionDarken,
+            position = 6
+    )
+    default boolean hideGoalBarWhenDarkened() {
+        return false;
     }
 
     @ConfigSection(
