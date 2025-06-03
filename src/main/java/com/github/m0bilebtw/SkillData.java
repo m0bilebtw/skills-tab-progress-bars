@@ -61,10 +61,6 @@ enum SkillData {
 	private final @Varp int goalStartVarp;
 	private final @Varp int goalEndVarp;
 
-	String getName() {
-		return skill.getName();
-	}
-
 	static SkillData get(int idx) {
 		if (idx < 0 || idx >= values().length) {
 			return null;
