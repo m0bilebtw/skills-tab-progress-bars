@@ -89,7 +89,8 @@ public interface SkillsTabProgressBarsConfig extends Config {
             description = "Settings for darkening skills as certain thresholds.",
             position = 10
     )
-    String sectionDarken = "Darken";
+    String SECTION_DARKEN = "Darken";
+
     String DARKEN_SETTINGS_ENUM_KEY = "darkenType";
 
     @ConfigItem(
@@ -97,7 +98,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
             name = "Darken skills",
             description = "When, if ever, should a skill stone be darkened?",
             position = 1,
-            section = sectionDarken
+            section = SECTION_DARKEN
     )
     default DarkenType darkenType() {
         return DarkenType.XP200m;
@@ -110,7 +111,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
             keyName = "grayOutOpacity",
             name = "Darken skills opacity",
             description = "Controls how dark skills get when darkened, either by level or XP limits.",
-            section = sectionDarken,
+            section = SECTION_DARKEN,
             position = 2
     )
     default int darkenOpacity() {
@@ -124,7 +125,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
             keyName = "darkenCustomLevel",
             name = "Custom darken level",
             description = "If Darken skills is set to Custom Level, this is the override value to use.",
-            section = sectionDarken,
+            section = SECTION_DARKEN,
             position = 3
 
     )
@@ -139,7 +140,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
             keyName = "darkenCustomXP",
             name = "Custom darken XP",
             description = "If Darken skills is set to Custom XP, this is the override value to use.",
-            section = sectionDarken,
+            section = SECTION_DARKEN,
             position = 4
     )
     default int darkenCustomXP() {
@@ -150,7 +151,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
             keyName = "hideProgressBarWhenDarkened",
             name = "Hide progress bar if darkened",
             description = "If a skill is darkened by a level or XP threshold, this option will also hide its progress bar.",
-            section = sectionDarken,
+            section = SECTION_DARKEN,
             position = 5
     )
     default boolean hideProgressBarWhenDarkened() {
@@ -161,7 +162,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
             keyName = "hideGoalBarWhenDarkened",
             name = "Hide goal bar if darkened",
             description = "If a skill is darkened by a level or XP threshold, this option will also hide its goal bar.",
-            section = sectionDarken,
+            section = SECTION_DARKEN,
             position = 6
     )
     default boolean hideGoalBarWhenDarkened() {
@@ -173,14 +174,14 @@ public interface SkillsTabProgressBarsConfig extends Config {
             description = "Settings for level and goal progress bar colours.",
             position = 20
     )
-    String sectionColours = "Bar Colours";
+    String SECTION_COLOURS = "Bar Colours";
 
     @Alpha
     @ConfigItem(
             keyName = "progressBarStartColor",
             name = "Start color",
             description = "The color from which the progress bar fades.",
-            section = sectionColours,
+            section = SECTION_COLOURS,
             position = 1
     )
     default Color progressBarStartColor() {
@@ -192,7 +193,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
             keyName = "progressBarEndColor",
             name = "End color",
             description = "The color to which the progress bar fades.",
-            section = sectionColours,
+            section = SECTION_COLOURS,
             position = 2
     )
     default Color progressBarEndColor() {
@@ -204,7 +205,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
             keyName = "backgroundColor",
             name = "Background color",
             description = "Sets the color for the background drawn behind progress bars.",
-            section = sectionColours,
+            section = SECTION_COLOURS,
             position = 3
     )
     default Color backgroundColor() {
@@ -216,7 +217,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
             keyName = "goalBarStartColor",
             name = "Goal start color",
             description = "The color from which the goal bar fades.",
-            section = sectionColours,
+            section = SECTION_COLOURS,
             position = 4
     )
     default Color goalBarStartColor() {
@@ -228,7 +229,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
             keyName = "goalBarEndColor",
             name = "Goal end color",
             description = "The color to which the goal bar fades.",
-            section = sectionColours,
+            section = SECTION_COLOURS,
             position = 5
     )
     default Color goalBarEndColor() {
