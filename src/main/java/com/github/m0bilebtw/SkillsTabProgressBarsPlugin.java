@@ -7,7 +7,7 @@ import net.runelite.api.Experience;
 import net.runelite.api.GameState;
 import net.runelite.api.events.ScriptPostFired;
 import net.runelite.api.events.ScriptPreFired;
-import net.runelite.api.widgets.ComponentID;
+import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.JavaScriptCallback;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetPositionMode;
@@ -125,7 +125,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 	 * If the plugin is started after the skill panel has been built, this will add the bar widgets that are needed.
 	 */
 	private void buildSkillBars() {
-		Widget skillsContainer = client.getWidget(ComponentID.SKILLS_CONTAINER);
+		Widget skillsContainer = client.getWidget(InterfaceID.Stats.UNIVERSE);
 		if (skillsContainer == null) {
 			return;
 		}
@@ -309,7 +309,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 	 * See {@link #handleContainerListener}
 	 */
 	private void addContainerListener() {
-		Widget container = client.getWidget(ComponentID.SKILLS_CONTAINER);
+		Widget container = client.getWidget(InterfaceID.Stats.UNIVERSE);
 		if (container == null) {
 			return;
 		}
@@ -331,7 +331,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 	 * See {@link #handleContainerListener}
 	 */
 	private void removeContainerListener() {
-		Widget container = client.getWidget(ComponentID.SKILLS_CONTAINER);
+		Widget container = client.getWidget(InterfaceID.Stats.UNIVERSE);
 		if (container == null) {
 			return;
 		}
