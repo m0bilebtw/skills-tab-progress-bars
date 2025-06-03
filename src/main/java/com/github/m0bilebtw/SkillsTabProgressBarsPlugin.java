@@ -144,10 +144,12 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 			Widget parent = grouping.getBarBackground().getParent();
 			removeHoverListener(parent, grouping);
 			Widget[] children = parent.getChildren();
-			for (int i = 0; i < children.length; i++) {
-				Widget child = children[i];
-				if (grouping.contains(child)) {
-					children[i] = null;
+			if (children != null) {
+				for (int i = 0; i < children.length; i++) {
+					Widget child = children[i];
+					if (grouping.contains(child)) {
+						children[i] = null;
+					}
 				}
 			}
 		}
@@ -346,7 +348,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 			for (int i = 0; i < SkillData.values().length; i++)	{
 				SkillData skill = SkillData.get(i);
 				SkillBarWidgetGrouping widgets = skillBars[i];
-				if (widgets != null) {
+				if (skill != null && widgets != null) {
 					updateSkillBar(skill, widgets);
 					handleHoverListener(widgets.getBarBackground().getParent(), widgets);
 				}
