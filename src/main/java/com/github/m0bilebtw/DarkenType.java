@@ -18,13 +18,4 @@ public enum DarkenType {
     public String toString() {
         return displayName;
     }
-
-    public static DarkenType migrate(SkillsTabProgressBarsConfig config) {
-        if (config.grayOut99())
-            return DarkenType.Level99;
-        else if (config.grayOut200m())
-            return DarkenType.XP200m;
-        else
-            return DarkenType.None;
-    }
 }

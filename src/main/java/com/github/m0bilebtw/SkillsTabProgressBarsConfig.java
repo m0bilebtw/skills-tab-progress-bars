@@ -90,44 +90,6 @@ public interface SkillsTabProgressBarsConfig extends Config {
             position = 10
     )
     String sectionDarken = "Darken";
-
-    @Deprecated
-    @ConfigItem(
-            keyName = "grayOut99",
-            name = "Darken skills at 99",
-            description = "Show levels at 99 as darker than the others.",
-            hidden = true,
-            section = sectionDarken
-    )
-    default boolean grayOut99() {
-        return false;
-    }
-
-    @Deprecated
-    @ConfigItem(
-            keyName = "grayOut200m",
-            name = "Darken skills at 200m xp",
-            description = "Show skills at 200million experience as darker than the others.",
-            hidden = true,
-            section = sectionDarken
-    )
-    default boolean grayOut200m() {
-        return true;
-    }
-
-    String DARKEN_SETTINGS_MIGRATED_KEY = "darkenMigratedToEnumSystem";
-
-    @ConfigItem(
-            keyName = DARKEN_SETTINGS_MIGRATED_KEY,
-            name = "Darken migrated to enum system",
-            description = "Whether the skill darkening settings have yet been migrated to the new DarkenType enum system.",
-            hidden = true,
-            section = sectionDarken
-    )
-    default boolean darkenMigratedToEnumSystem() {
-        return false;
-    }
-
     String DARKEN_SETTINGS_ENUM_KEY = "darkenType";
 
     @ConfigItem(
