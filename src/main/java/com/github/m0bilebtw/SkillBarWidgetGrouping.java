@@ -31,15 +31,15 @@ import net.runelite.api.widgets.Widget;
 @Data
 @AllArgsConstructor
 class SkillBarWidgetGrouping {
-	private Widget grayOut99;
-	private Widget barBackground;
-	private Widget barForeground;
-	private Widget goalBackground;
-	private Widget goalForeground;
+    private Widget grayOut99;
+    private Widget barBackground;
+    private Widget barForeground;
+    private Widget goalBackground;
+    private Widget goalForeground;
 
-	boolean contains(Widget other) {
-		return other == barBackground || other == barForeground
-			|| other == goalBackground || other == goalForeground
-			|| other == grayOut99;
-	}
+    boolean contains(Widget other) {
+        return other == barBackground || other == barForeground
+                || other == goalBackground || other == goalForeground
+                || other == grayOut99;
+    }
 }
