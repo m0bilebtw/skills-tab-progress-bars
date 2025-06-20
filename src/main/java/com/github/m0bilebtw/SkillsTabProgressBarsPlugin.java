@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.Experience;
 import net.runelite.api.GameState;
+import net.runelite.api.Skill;
 import net.runelite.api.events.ScriptPostFired;
 import net.runelite.api.events.ScriptPreFired;
 import net.runelite.api.gameval.InterfaceID;
@@ -22,6 +23,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 
 import javax.inject.Inject;
 import java.awt.Color;
+import java.util.Set;
 
 @PluginDescriptor(
         name = "Skills Progress Bars",
@@ -40,6 +42,24 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
     private static final int INDENT_WIDTH_ONE_SIDE = 4; // The skill panel from OSRS indents 3 pixels at the bottom (and top)
 
     private static final int WIDGET_CHILD_ID_MASK = 0xFFFF;
+
+    private static final Set<Skill> SKILLS_F2P = Set.of(
+            Skill.ATTACK,
+            Skill.STRENGTH,
+            Skill.DEFENCE,
+            Skill.RANGED,
+            Skill.PRAYER,
+            Skill.MAGIC,
+            Skill.RUNECRAFT,
+            Skill.HITPOINTS,
+            Skill.CRAFTING,
+            Skill.MINING,
+            Skill.SMITHING,
+            Skill.FISHING,
+            Skill.COOKING,
+            Skill.FIREMAKING,
+            Skill.WOODCUTTING
+    );
 
     @Inject
     private Client client;
@@ -355,7 +375,10 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
         });
     }
 
-    private boolean shouldDarken(int currentLevel, int currentXP) {
+    private boolean shouldDarken(Skill skill, int currentLevel, int currentXP) {
+        if (config.darkenMembersSkills() && !SKILLS_F2P.contains(skill))
+            return true;
+
         switch (config.darkenType()) {
             case None:
                 return false;
@@ -404,7 +427,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
             maxWidth -= INDENT_WIDTH_ONE_SIDE * 2;
         }
 
-        final boolean shouldGrayOut = shouldDarken(currentLevel, currentXP);
+        final boolean shouldGrayOut = shouldDarken(skill.getSkill(), currentLevel, currentXP);
         final boolean shouldCalculateNormalBar =
                 !config.showOnlyGoals() &&
                         (currentLevel < Experience.MAX_REAL_LEVEL || config.virtualLevels()) &&

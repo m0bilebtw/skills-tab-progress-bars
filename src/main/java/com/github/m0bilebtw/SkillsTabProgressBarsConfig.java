@@ -104,6 +104,17 @@ public interface SkillsTabProgressBarsConfig extends Config {
         return DarkenType.XP200m;
     }
 
+    @ConfigItem(
+            keyName = "darkenMembersSkills",
+            name = "Always darken members skills",
+            description = "In addition to the 'Darken skills' option, should members skills always be darkened?",
+            position = 2,
+            section = SECTION_DARKEN
+    )
+    default boolean darkenMembersSkills() {
+        return false;
+    }
+
     @Range(
             max = 255
     )
@@ -112,7 +123,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
             name = "Darken skills opacity",
             description = "Controls how dark skills get when darkened, either by level or XP limits.",
             section = SECTION_DARKEN,
-            position = 2
+            position = 3
     )
     default int darkenOpacity() {
         return 127;
@@ -126,7 +137,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
             name = "Custom darken level",
             description = "If Darken skills is set to Custom Level, this is the override value to use.",
             section = SECTION_DARKEN,
-            position = 3
+            position = 4
 
     )
     default int darkenCustomLevel() {
@@ -141,7 +152,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
             name = "Custom darken XP",
             description = "If Darken skills is set to Custom XP, this is the override value to use.",
             section = SECTION_DARKEN,
-            position = 4
+            position = 5
     )
     default int darkenCustomXP() {
         return Experience.getXpForLevel(Experience.MAX_REAL_LEVEL);
@@ -152,7 +163,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
             name = "Hide progress bar if darkened",
             description = "If a skill is darkened by a level or XP threshold, this option will also hide its progress bar.",
             section = SECTION_DARKEN,
-            position = 5
+            position = 6
     )
     default boolean hideProgressBarWhenDarkened() {
         return false;
@@ -163,7 +174,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
             name = "Hide goal bar if darkened",
             description = "If a skill is darkened by a level or XP threshold, this option will also hide its goal bar.",
             section = SECTION_DARKEN,
-            position = 6
+            position = 7
     )
     default boolean hideGoalBarWhenDarkened() {
         return false;
