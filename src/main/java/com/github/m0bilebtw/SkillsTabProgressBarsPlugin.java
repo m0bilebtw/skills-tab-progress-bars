@@ -127,7 +127,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
         if (event.getScriptId() != SCRIPTID_STATS_INIT) {
             return;
         }
-        currentWidget = event.getScriptEvent().getSource();
+        currentWidget = event.getScriptEvent().getSource().getParent();
     }
 
     @Subscribe
@@ -189,6 +189,11 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
      * @param parent The parent widget inside which the skill bar is created
      */
     private void buildSkillBar(Widget parent) {
+        if (currentWidget.getType() != WidgetType.LAYER) {
+            log.error("buildSkillBar called with non-layer widget");
+            return;
+        }
+
         int idx = getChildId(parent.getId()) - 1;
         SkillData skill = SkillData.get(idx);
         if (skill == null) {
