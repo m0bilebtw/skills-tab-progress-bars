@@ -37,7 +37,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
     private static final int SCRIPTID_STATS_SKILLTOTAL = 396;
 
     static final int MINIMUM_BAR_HEIGHT = 1;
-    static final int MAXIMUM_BAR_HEIGHT = 32;
+    static final int MAXIMUM_BAR_HEIGHT = 30;
 
     private static final int INDENT_WIDTH_ONE_SIDE = 4; // The skill panel from OSRS indents 3 pixels at the bottom (and top)
 
@@ -198,6 +198,15 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
         SkillData skill = SkillData.get(idx);
         if (skill == null) {
             return;
+        }
+
+        // Since sailing pre-release with the new total level full-width bar, all skills had their widgets height changed to 30, except the bottom three skills remained at 32.
+        // This ultimately resulted in bars on those bottom three skills of height 1 or 2 being hidden behind the total level bar,
+        // and bars of greater height still appearing shorter than the bars on the rest of the skills.
+        // By resetting their heights back to maximum bar height (which itself needed changing for this update), they appear normally.
+        if (skill == SkillData.CONSTRUCTION || skill == SkillData.HUNTER || skill == SkillData.SAILING) {
+            parent.setOriginalHeight(MAXIMUM_BAR_HEIGHT);
+            parent.revalidate();
         }
 
         Widget grayOut99 = parent.createChild(-1, WidgetType.RECTANGLE);
