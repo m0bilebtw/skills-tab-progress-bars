@@ -33,7 +33,8 @@ import java.util.Set;
 @Slf4j
 public class SkillsTabProgressBarsPlugin extends Plugin {
 
-    private static final int SCRIPTID_STATS_INIT = 393;
+    private static final int SCRIPTID_STATS_INIT = 394;
+    private static final int SCRIPTID_STATS_REFRESH = 393;
     private static final int SCRIPTID_STATS_SKILLTOTAL = 396;
 
     static final int MINIMUM_BAR_HEIGHT = 1;
@@ -71,6 +72,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
     private SkillsTabProgressBarsConfig config;
 
     private Widget currentWidget;
+    private SkillData lastSkillBuiltBarsFor;
     private SkillBarWidgetGrouping currentHovered;
     private SkillBarWidgetGrouping[] skillBars = new SkillBarWidgetGrouping[SkillData.values().length];
 
@@ -124,15 +126,18 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 
     @Subscribe
     public void onScriptPreFired(ScriptPreFired event) {
-        if (event.getScriptId() != SCRIPTID_STATS_INIT) {
-            return;
-        }
-        currentWidget = event.getScriptEvent().getSource().getParent();
+        if (event.getScriptId() == SCRIPTID_STATS_INIT)
+            currentWidget = event.getScriptEvent().getSource().getParent();
+        else if (event.getScriptId() == SCRIPTID_STATS_REFRESH)
+            currentWidget = event.getScriptEvent().getSource();
     }
 
     @Subscribe
     public void onScriptPostFired(ScriptPostFired event) {
-        if (event.getScriptId() == SCRIPTID_STATS_INIT && currentWidget != null) {
+        if (
+                (event.getScriptId() == SCRIPTID_STATS_INIT || event.getScriptId() == SCRIPTID_STATS_REFRESH)
+                        && currentWidget != null
+        ) {
             buildSkillBar(currentWidget);
         }
         // Add the container listener after all the other bars have been created
@@ -199,6 +204,13 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
         if (skill == null) {
             return;
         }
+
+        // Had to change to separate init and refresh scripts for sailing because of Jagex changes.
+        // init script that fires twice per skill. Avoid building twice the amount of bars.
+        if (skill == lastSkillBuiltBarsFor) {
+            return;
+        }
+        lastSkillBuiltBarsFor = skill;
 
         // Since sailing pre-release with the new total level full-width bar, all skills had their widgets height changed to 30, except the bottom three skills remained at 32.
         // This ultimately resulted in bars on those bottom three skills of height 1 or 2 being hidden behind the total level bar,
