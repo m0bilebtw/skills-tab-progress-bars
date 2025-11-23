@@ -430,12 +430,12 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
                 return false;
             case Level99:
                 return currentLevel >= Experience.MAX_REAL_LEVEL;
-            case LevelCustom:
-                return currentLevel >= config.darkenCustomLevel();
             case XP200m:
                 return currentXP >= Experience.MAX_SKILL_XP;
+            case LevelCustom:
+                return config.invertDarkenConditions() ? currentLevel <= config.darkenCustomLevel() : currentLevel >= config.darkenCustomLevel();
             case XPCustom:
-                return currentXP >= config.darkenCustomXP();
+                return config.invertDarkenConditions() ? currentXP <= config.darkenCustomXP() : currentXP >= config.darkenCustomXP();
         }
 
         return false;
