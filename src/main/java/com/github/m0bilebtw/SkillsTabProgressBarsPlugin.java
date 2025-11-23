@@ -126,10 +126,14 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 
     @Subscribe
     public void onScriptPreFired(ScriptPreFired event) {
-        if (event.getScriptId() == SCRIPTID_STATS_INIT)
-            currentWidget = event.getScriptEvent().getSource().getParent();
-        else if (event.getScriptId() == SCRIPTID_STATS_REFRESH)
-            currentWidget = event.getScriptEvent().getSource();
+        if (event.getScriptId() == SCRIPTID_STATS_INIT || event.getScriptId() == SCRIPTID_STATS_REFRESH) {
+            Widget widget = event.getScriptEvent().getSource();
+            if (widget.getId() == InterfaceID.Stats.UNIVERSE) {
+                currentWidget = null;
+            } else {
+                currentWidget = widget;
+            }
+        }
     }
 
     @Subscribe
@@ -194,7 +198,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
      * @param parent The parent widget inside which the skill bar is created
      */
     private void buildSkillBar(Widget parent) {
-        if (currentWidget.getType() != WidgetType.LAYER) {
+        if (parent.getType() != WidgetType.LAYER) {
             log.error("buildSkillBar called with non-layer widget");
             return;
         }
@@ -266,6 +270,22 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 
         updateSkillBar(skill, grouping);
         handleHoverListener(parent, grouping);
+
+        // Actively remove previous bars. Required as otherwise the bars built by init script overlap those by
+        // refresh script, so clean them up before we throw away the references.
+        if (skillBars[idx] != null) {
+            SkillBarWidgetGrouping groupingToRemove = skillBars[idx];
+            Widget[] children = parent.getChildren();
+            if (children != null) {
+                for (int i = 0; i < children.length; i++) {
+                    if (groupingToRemove.contains(children[i])) {
+                        children[i] = null;
+                    }
+                }
+                parent.setChildren(children);
+            }
+        }
+
         skillBars[idx] = grouping;
     }
 
@@ -503,7 +523,6 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
             barForeground.setOpacity(255);
         }
 
-
         if (shouldCalculateGoalBar) {
             final int yPos = barHeight * (shouldCalculateNormalBar ? 1 : 0);
 
@@ -551,7 +570,6 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
                 (float) (start[1] + percent * (end[1] - start[1])),
                 (float) (start[2] + percent * (end[2] - start[2]))).getRGB();
     }
-
 
     /**
      * Linearly interpolate between the alpha values of two colours
