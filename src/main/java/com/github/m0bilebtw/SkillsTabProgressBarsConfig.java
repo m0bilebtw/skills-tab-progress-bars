@@ -11,10 +11,20 @@ public interface SkillsTabProgressBarsConfig extends Config {
     String GROUP = "skillstabprogressbars";
 
     @ConfigItem(
+            keyName = "useSkillDividerAsProgressBar",
+            name = "Use Skill Divider As Progress Bar",
+            description = "The progress bar will be positioned over the line that divides the two numbers of the skill.",
+            position = 1
+    )
+    default boolean useSkillDividerAsProgressBar() {
+        return false;
+    }
+
+    @ConfigItem(
             keyName = "indent",
             name = "Match skill panel indent",
             description = "Progress bars and backgrounds will start and stop a few pixels indented to match the skill panel.",
-            position = 1
+            position = 2
     )
     default boolean indent() {
         return true;
@@ -28,7 +38,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
             keyName = "barHeight",
             name = "Progress bar height",
             description = "The total height of the progress bars displayed over the skills tab (with goals showing, height is shared between the bars if set too high).",
-            position = 2
+            position = 3
     )
     default int barHeight() {
         return 2;
@@ -38,7 +48,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
             keyName = "virtualLevels",
             name = "Show for virtual levels",
             description = "Show progress towards 'virtual levels' past 99.",
-            position = 3
+            position = 4
     )
     default boolean virtualLevels() {
         return false;
@@ -48,7 +58,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
             keyName = "stillShowAt200m",
             name = "Still show at 200m",
             description = "Show full progress bar at 200m XP. This was previous unintentional behaviour, kept available for those that want it.",
-            position = 4
+            position = 5
     )
     default boolean stillShowAt200m() {
         return false;
@@ -58,7 +68,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
             keyName = "showGoals",
             name = "Show goals progress",
             description = "Show progress towards the goals you set using the in-game XP menu in addition to progress towards individual levels.",
-            position = 6
+            position = 7
     )
     default boolean showGoals() {
         return false;
@@ -68,7 +78,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
             keyName = "showOnlyGoals",
             name = "Show ONLY goals progress",
             description = "Hides progress towards individual levels leaving only goals progress.",
-            position = 7
+            position = 8
     )
     default boolean showOnlyGoals() {
         return false;
@@ -78,7 +88,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
             keyName = "showOnlyOnHover",
             name = "Only show when hovered",
             description = "Only show the progress bars and goals for a skill when it is being hovered over.",
-            position = 8
+            position = 9
     )
     default boolean showOnHover() {
         return false;
@@ -87,7 +97,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
     @ConfigSection(
             name = "Darken",
             description = "Settings for darkening skills as certain thresholds.",
-            position = 10
+            position = 11
     )
     String SECTION_DARKEN = "Darken";
 

@@ -37,6 +37,10 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
     private static final int SCRIPTID_STATS_REFRESH = 393;
     private static final int SCRIPTID_STATS_SKILLTOTAL = 396;
 
+    private static final int CONTAINER_SIZE = 20;
+    private static final int SEGMENT_SIZE = 2;   // Thickness of the line
+    private static final int STEP = 1;           // Distance between segments
+
     static final int MINIMUM_BAR_HEIGHT = 1;
     static final int MAXIMUM_BAR_HEIGHT = 30;
 
@@ -241,11 +245,15 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
         barBackground.setWidthMode(WidgetSizeMode.MINUS);
         barBackground.setFilled(true);
         barBackground.setHasListener(true);
-
-        Widget barForeground = parent.createChild(-1, WidgetType.RECTANGLE);
+        Widget barForeground = parent.createChild(-1, WidgetType.LAYER);
         barForeground.setYPositionMode(WidgetPositionMode.ABSOLUTE_BOTTOM);
-        barForeground.setFilled(true);
+        barForeground.setFilled(false);
         barForeground.setHasListener(true);
+        barForeground.setOriginalX(0);
+        barForeground.setOriginalY(0);
+        barForeground.setOriginalWidth(62);
+        barForeground.setOriginalHeight(30);
+        Widget[] progressBarSegments = createProgressBarSegments(barForeground);
 
         Widget goalBackground = parent.createChild(-1, WidgetType.RECTANGLE);
         goalBackground.setYPositionMode(WidgetPositionMode.ABSOLUTE_BOTTOM);
@@ -258,15 +266,13 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
         goalForeground.setFilled(true);
         goalForeground.setHasListener(true);
 
-        SkillBarWidgetGrouping grouping = new SkillBarWidgetGrouping(grayOut99, barBackground, barForeground, goalBackground, goalForeground);
+        SkillBarWidgetGrouping grouping = new SkillBarWidgetGrouping(grayOut99, barBackground, barForeground, goalBackground, goalForeground, progressBarSegments);
 
         JavaScriptCallback updateCallback = ev -> updateSkillBar(skill, grouping);
 
-        grayOut99.setOnVarTransmitListener(updateCallback);
-        barBackground.setOnVarTransmitListener(updateCallback);
-        barForeground.setOnVarTransmitListener(updateCallback);
-        goalBackground.setOnVarTransmitListener(updateCallback);
-        goalForeground.setOnVarTransmitListener(updateCallback);
+        for (Widget widget : grouping.all()) {
+            widget.setOnVarTransmitListener(updateCallback);
+        }
 
         updateSkillBar(skill, grouping);
         handleHoverListener(parent, grouping);
@@ -289,6 +295,51 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
         skillBars[idx] = grouping;
     }
 
+    private Widget[] createProgressBarSegments(Widget parent)
+    {
+        int numberOfSegments = CONTAINER_SIZE / STEP;
+        Widget[] segmentArray = new Widget[numberOfSegments];
+
+        for (int i = 0; i < numberOfSegments; i++)
+        {
+            Widget segment = parent.createChild(-1, WidgetType.RECTANGLE);
+            segment.setXPositionMode(WidgetPositionMode.ABSOLUTE_LEFT);
+            segment.setYPositionMode(WidgetPositionMode.ABSOLUTE_BOTTOM);
+            segmentArray[i] = segment;
+        }
+
+        return segmentArray;
+    }
+
+    private void updateProgressBarSegments(SkillBarWidgetGrouping grouping, double progressPercent, int colorRgb)
+    {
+        Widget[] progressBarSegments = grouping.getProgressBarSegments();
+        int numberOfSegments = progressBarSegments.length;
+        int numberOfFilledSegments = (int) Math.round((progressPercent) * numberOfSegments);
+
+        for (int i = 0; i < numberOfSegments; i++)
+        {
+            Widget segment = progressBarSegments[i];
+
+            // 45 degree diagonal
+            int xPos = 34 + (i * STEP);
+            int yPos = 4 + (i * STEP);
+            segment.setOriginalX(xPos);
+            segment.setOriginalY(yPos);
+
+            if (i < numberOfFilledSegments) {
+                segment.setFilled(true);
+                segment.setTextColor(colorRgb);
+                segment.setOriginalWidth(SEGMENT_SIZE);
+                segment.setOriginalHeight(SEGMENT_SIZE);
+            } else {
+                segment.setFilled(false);
+                segment.setOriginalWidth(0);
+                segment.setOriginalHeight(0);
+            }
+        }
+    }
+
     /**
      * Add or remove hover listeners on the provided widget.
      *
@@ -307,34 +358,25 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
      * See {@link #handleHoverListener}
      */
     private void addHoverListener(Widget parent, SkillBarWidgetGrouping grouping) {
-        Widget grayOut99 = grouping.getGrayOut99();
-        Widget barBackground = grouping.getBarBackground();
-        Widget barForeground = grouping.getBarForeground();
-        Widget goalBackground = grouping.getGoalBackground();
-        Widget goalForeground = grouping.getGoalForeground();
+        Widget[] groupWidgets = grouping.all();
 
-        grayOut99.setHidden(true);
-        barBackground.setHidden(true);
-        barForeground.setHidden(true);
-        goalBackground.setHidden(true);
-        goalForeground.setHidden(true);
+        for (Widget widget : groupWidgets) {
+            widget.setHidden(true);
+        }
 
         parent.setOnMouseOverListener((JavaScriptCallback) ev -> {
             // We need to hide the old hovered widgets so there aren't multiple visible
             // when moving the mouse between skills.
             if (currentHovered != null) {
-                currentHovered.getGrayOut99().setHidden(true);
-                currentHovered.getBarBackground().setHidden(true);
-                currentHovered.getBarForeground().setHidden(true);
-                currentHovered.getGoalBackground().setHidden(true);
-                currentHovered.getGoalForeground().setHidden(true);
+                for (Widget widget : currentHovered.all()) {
+                    widget.setHidden(true);
+                }
             }
+
             currentHovered = grouping;
-            grayOut99.setHidden(false);
-            barBackground.setHidden(false);
-            barForeground.setHidden(false);
-            goalBackground.setHidden(false);
-            goalForeground.setHidden(false);
+            for (Widget widget : groupWidgets) {
+                widget.setHidden(false);
+            }
         });
 
         parent.setHasListener(true);
@@ -344,17 +386,9 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
      * See {@link #handleHoverListener}
      */
     private void removeHoverListener(Widget parent, SkillBarWidgetGrouping grouping) {
-        Widget grayOut99 = grouping.getGrayOut99();
-        Widget barBackground = grouping.getBarBackground();
-        Widget barForeground = grouping.getBarForeground();
-        Widget goalBackground = grouping.getGoalBackground();
-        Widget goalForeground = grouping.getGoalForeground();
-
-        grayOut99.setHidden(false);
-        barBackground.setHidden(false);
-        barForeground.setHidden(false);
-        goalBackground.setHidden(false);
-        goalForeground.setHidden(false);
+        for (Widget widget : grouping.all()) {
+            widget.setHidden(false);
+        }
 
         parent.setOnMouseOverListener((Object[]) null);
     }
@@ -383,11 +417,9 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 
         container.setOnMouseLeaveListener((JavaScriptCallback) ev -> {
             if (currentHovered != null) {
-                currentHovered.getGrayOut99().setHidden(true);
-                currentHovered.getBarBackground().setHidden(true);
-                currentHovered.getBarForeground().setHidden(true);
-                currentHovered.getGoalBackground().setHidden(true);
-                currentHovered.getGoalForeground().setHidden(true);
+                for (Widget widget : currentHovered.all()) {
+                    widget.setHidden(true);
+                }
             }
             currentHovered = null;
         });
@@ -510,17 +542,38 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
             barBackground.setOpacity(255 - config.backgroundColor().getAlpha());
 
             final int progressWidth = (int) (maxWidth * barPercent);
+            final int progressColor = lerpHSB(getProgressStartHSB(), getProgressEndHSB(), barPercent);
+            final int progressOpacity = 255 - lerpAlpha(config.progressBarStartColor(), config.progressBarEndColor(), barPercent);
 
-            barForeground.setOriginalX(startX);
-            barForeground.setOriginalY(0);
-            barForeground.setOriginalWidth(progressWidth);
-            barForeground.setOriginalHeight(barHeight);
-            barForeground.setTextColor(lerpHSB(getProgressStartHSB(), getProgressEndHSB(), barPercent)); // interpolate between start and end
-            barForeground.setOpacity(255 - lerpAlpha(config.progressBarStartColor(), config.progressBarEndColor(), barPercent));
+            barForeground.setOpacity(progressOpacity);
+            for (Widget progressBarSegment : grouping.getProgressBarSegments()) {
+                progressBarSegment.setOpacity(progressOpacity);
+            }
+            if (!config.useSkillDividerAsProgressBar()) {
+                Widget[] progressBarSegments = grouping.getProgressBarSegments();
+                for (Widget progressBarSegment : progressBarSegments) {
+                    progressBarSegment.setOriginalWidth(0);
+                    progressBarSegment.setOriginalHeight(0);
+                }
+                Widget firstSegment = progressBarSegments[0];
+                firstSegment.setOriginalX(startX);
+                firstSegment.setOriginalY(0);
+                firstSegment.setOriginalWidth(progressWidth);
+                firstSegment.setOriginalHeight(barHeight);
+                firstSegment.setFilled(true);
+                firstSegment.setTextColor(progressColor); // interpolate between start and end
+            } else {
+                barBackground.setOriginalWidth(0);
+                barBackground.setOriginalHeight(0);
+                this.updateProgressBarSegments(grouping, barPercent, progressColor);
+            }
         } else {
             // Set the bars to be invisible so they don't conflict with the hover hiding
             barBackground.setOpacity(255);
             barForeground.setOpacity(255);
+            for (Widget progressBarSegment : grouping.getProgressBarSegments()) {
+                progressBarSegment.setOpacity(255);
+            }
         }
 
         if (shouldCalculateGoalBar) {
@@ -549,11 +602,10 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
             goalBackground.setOpacity(255);
             goalForeground.setOpacity(255);
         }
-        grayOut99.revalidate();
-        barBackground.revalidate();
-        barForeground.revalidate();
-        goalBackground.revalidate();
-        goalForeground.revalidate();
+
+        for (Widget widget : grouping.all()) {
+            widget.revalidate();
+        }
     }
 
     /**

@@ -28,6 +28,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.runelite.api.widgets.Widget;
 
+import java.util.Arrays;
+import java.util.stream.Stream;
+
 @Data
 @AllArgsConstructor
 class SkillBarWidgetGrouping {
@@ -36,10 +39,21 @@ class SkillBarWidgetGrouping {
     private Widget barForeground;
     private Widget goalBackground;
     private Widget goalForeground;
+    private Widget[] progressBarSegments;
 
     boolean contains(Widget other) {
-        return other == barBackground || other == barForeground
-                || other == goalBackground || other == goalForeground
-                || other == grayOut99;
+        return Arrays.asList(all()).contains(other);
+    }
+
+    Widget[] all() {
+        Widget[] bars = new Widget[]{
+                grayOut99,
+                barBackground,
+                barForeground,
+                goalBackground,
+                goalForeground,
+        };
+
+        return Stream.concat(Arrays.stream(bars), Arrays.stream(progressBarSegments)).toArray(Widget[]::new);
     }
 }
