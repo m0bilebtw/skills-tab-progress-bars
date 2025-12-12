@@ -17,7 +17,7 @@ public interface SkillsTabProgressBarsConfig extends Config {
             position = 1
     )
     default boolean useSkillDividerAsProgressBar() {
-        return true;
+        return false;
     }
 
     @ConfigItem(
